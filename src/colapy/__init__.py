@@ -1,3 +1,4 @@
+import abc
 import typing as tp
 
 
@@ -17,6 +18,24 @@ class AZ(tp.NamedTuple):
     Z: int
 
 
+class GeneratorBase(abc.ABC):
+    @abc.abstractmethod
+    def __call__(self) -> EventData:
+        raise NotImplementedError
+
+
+class ConverterBase(abc.ABC):
+    @abc.abstractmethod
+    def __call__(self, event_data: EventData) -> EventData:
+        raise NotImplementedError
+
+
+class WriterBase(abc.ABC):
+    @abc.abstractmethod
+    def __call__(self, event_data: EventData) -> None:
+        raise NotImplementedError
+
+
 __all__ = [
     '__doc__',
     '__version__',
@@ -26,4 +45,7 @@ __all__ = [
     'ParticleClass',
     'EventInitialState',
     'EventData',
+    'GeneratorBase',
+    'ConverterBase',
+    'WriterBase',
 ]

@@ -1,6 +1,6 @@
 [project]
 name = "colapy"
-version = "0.0.1"
+version = "0.0.1.1"
 description = "A sample C++ library with Python bindings"
 readme = "README.md"
 license = {text = "MIT"}
@@ -15,7 +15,7 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
-    "Programming Language :: C++"
+    "Programming Language :: C++",
 ]
 keywords = ["cpp", "bindings"]
 dependencies = [
@@ -45,6 +45,6 @@ cmake.source-dir = "."
 # В нашем случае имя модуля 'my_python_module' совпадает с именем таргета в CMake.
 # Если бы у вас были еще и чисто Python-файлы, вы бы указали их здесь:
 wheel.packages = [
-    "src/colapy"
+    "src/colapy",
 ]
 
