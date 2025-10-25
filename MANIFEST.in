@@ -1,4 +1,0 @@
-include .gitignore
-include LICENSE
-include README.md
-exclude MANIFEST.in

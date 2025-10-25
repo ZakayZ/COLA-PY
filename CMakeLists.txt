@@ -12,7 +12,7 @@ if (NOT COLA_FOUND)
     FetchContent_Declare(
         COLA
         GIT_REPOSITORY https://github.com/Spectator-matter-group-INR-RAS/COLA.git
-        GIT_TAG master
+        GIT_TAG main
     )
     FetchContent_MakeAvailable(COLA)
 endif()

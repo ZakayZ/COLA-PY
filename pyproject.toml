@@ -1,33 +1,3 @@
-[project]
-name = "colapy"
-version = "0.0.1.1"
-description = "A sample C++ library with Python bindings"
-readme = "README.md"
-license = {text = "MIT"}
-authors = [
-    {name = "Artemii Novikov", email = "artyasen@yandex.ru"}
-]
-classifiers = [
-    "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: C++",
-]
-keywords = ["cpp", "bindings"]
-dependencies = [
-]
-requires-python = ">=3.8"
-
-[project.urls]
-# Homepage = "https://github.com/ZakayZ/COLA-PY"
-Repository = "https://github.com/ZakayZ/COLA-PY"
-# Documentation = "https://github.com/yourusername/my-library"
-
-
 [build-system]
 # Указываем, что для сборки нужны scikit-build-core и pybind11 (для CMake find_package)
 requires = [
@@ -37,14 +7,55 @@ requires = [
 ]
 build-backend = "scikit_build_core.build"
 
-[tool.scikit-build]
-# Указываем, где лежит корневой CMakeLists.txt
-cmake.source-dir = "."
-# Указываем, куда scikit-build-core должен установить готовый модуль,
-# чтобы он попал в wheel-пакет под правильным именем.
-# В нашем случае имя модуля 'my_python_module' совпадает с именем таргета в CMake.
-# Если бы у вас были еще и чисто Python-файлы, вы бы указали их здесь:
-wheel.packages = [
-    "src/colapy",
+[project]
+name = "colapy"
+version = "0.0.1.4"
+description = "Python binding for COLA framework"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+    { name = "Artemii Novikov", email = "artyasen@yandex.ru" }
+]
+classifiers = [
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: C++",
+]
+keywords = [
+    "cpp",
+    "bindings",
+]
+dependencies = []
+requires-python = ">=3.8"
+
+[project.urls]
+Repository = "https://github.com/ZakayZ/COLA-PY"
+
+[dependency-groups]
+test = [
+    "pytest",
+]
+dev = [
+    {include-group = "test"},
+    "ruff",
+    "cibuildwheel",
 ]
 
+[tool.scikit-build]
+minimum-version = "build-system.requires"
+cmake.source-dir = "."
+
+[tool.cibuildwheel]
+build-frontend = "build"
+enable = ["pypy"]
+# test-command = "python -m pytest tests"
+# test-sources = ["pyproject.toml", "tests"]
+# test-groups = ["test"]
