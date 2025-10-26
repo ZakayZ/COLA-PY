@@ -1,5 +1,4 @@
 [build-system]
-# Указываем, что для сборки нужны scikit-build-core и pybind11 (для CMake find_package)
 requires = [
     "scikit-build-core>=0.5",
     "cmake>=3.15",
@@ -9,7 +8,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "colapy"
-version = "0.0.1.4"
+version = "0.0.1.7"
 description = "Python binding for COLA framework"
 readme = "README.md"
 license = "MIT"

@@ -1,4 +1,13 @@
 cmake_minimum_required(VERSION 3.15)
+
+if (NOT DEFINED SKBUILD_PROJECT_NAME)
+    set(SKBUILD_PROJECT_NAME "colapy")
+endif()
+
+if (NOT DEFINED SKBUILD_PROJECT_VERSION)
+    set(SKBUILD_PROJECT_VERSION "1.0.0")
+endif()
+
 project(
     ${SKBUILD_PROJECT_NAME}
     VERSION ${SKBUILD_PROJECT_VERSION}
@@ -9,12 +18,70 @@ find_package(COLA)
 
 if (NOT COLA_FOUND)
     include(FetchContent)
+    include(GNUInstallDirs)
+
+    if (NOT DEFINED COLA_INSTALL_PREFIX)
+        if (DEFINED ENV{COLA_INSTALL_PREFIX})
+            set(COLA_INSTALL_PREFIX "$ENV{COLA_INSTALL_PREFIX}")
+            list(APPEND CMAKE_PREFIX_PATH ${COLA_INSTALL_PREFIX})
+        else()
+            # Default to user's local directory (cross-platform)
+            if (WIN32)
+                set(COLA_INSTALL_PREFIX "$ENV{USERPROFILE}/.local")
+            else()
+                set(COLA_INSTALL_PREFIX "$ENV{HOME}/.local")
+            endif()
+        endif()
+    endif()
+
+    message(STATUS "COLA not found ${COLA_INSTALL_PREFIX}")
+
     FetchContent_Declare(
         COLA
         GIT_REPOSITORY https://github.com/Spectator-matter-group-INR-RAS/COLA.git
         GIT_TAG main
+        GIT_SHALLOW TRUE
     )
-    FetchContent_MakeAvailable(COLA)
+    FetchContent_GetProperties(cola)
+
+    if(NOT COLA_POPULATED)
+        FetchContent_Populate(COLA)
+        
+        execute_process(
+            COMMAND ${CMAKE_COMMAND} 
+                -S ${cola_SOURCE_DIR}
+                -B ${cola_BINARY_DIR}
+                -DCMAKE_INSTALL_PREFIX=${COLA_INSTALL_PREFIX}
+                -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+            RESULT_VARIABLE result
+        )
+        
+        if(result)
+            message(FATAL_ERROR "Failed to configure COLA")
+        endif()
+        
+        execute_process(
+            COMMAND ${CMAKE_COMMAND} --build ${cola_BINARY_DIR}
+            RESULT_VARIABLE result
+        )
+        
+        if(result)
+            message(FATAL_ERROR "Failed to build COLA")
+        endif()
+        
+        execute_process(
+            COMMAND ${CMAKE_COMMAND} --install ${cola_BINARY_DIR}
+            RESULT_VARIABLE result
+        )
+        
+        if(result)
+            message(FATAL_ERROR "Failed to install COLA to ${COLA_INSTALL_PREFIX}")
+        endif()
+
+        message(STATUS "COLA installed successfully to ${COLA_INSTALL_PREFIX}")
+
+        find_package(COLA REQUIRED)
+    endif()
 endif()
 
 set(CMAKE_CXX_STANDARD 17)
@@ -35,23 +102,4 @@ target_link_libraries(_cola_impl PUBLIC COLA)
 
 target_compile_definitions(_cola_impl PRIVATE VERSION_INFO=${PROJECT_VERSION})
 
-# Install configuration
-install(TARGETS _cola_impl DESTINATION colapy)
-
-# Installation for Python package
-install(
-    DIRECTORY src/python/colapy/
-    DESTINATION .
-    FILES_MATCHING PATTERN "*.py"
-)
-
-# Testing
-# find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
-# enable_testing()
-#     if(Python_FOUND)
-#         add_test(
-#             NAME python_tests
-#             COMMAND ${Python_EXECUTABLE} -m pytest tests/
-#             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-#         )
-# endif()
+install(TARGETS _cola_impl DESTINATION ${SKBUILD_PROJECT_NAME})
