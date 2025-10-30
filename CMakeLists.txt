@@ -87,17 +87,13 @@ endif()
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Python and pybind11 setup
 find_package(pybind11 CONFIG REQUIRED)
 
-# Create Python module
 pybind11_add_module(
     _cola_impl 
     src/bindings.cpp
 )
 
-# Include directories
-# target_include_directories(_cola_impl PRIVATE src/cpp)
 target_link_libraries(_cola_impl PUBLIC COLA)
 
 target_compile_definitions(_cola_impl PRIVATE VERSION_INFO=${PROJECT_VERSION})
