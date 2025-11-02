@@ -1,5 +1,5 @@
-#include "factory.hh"
 #include <COLA.hh>
+#include <COLA-Py/factory.hh>
 
 int main() {
     auto factory = cola::python::PythonWriterFactory();

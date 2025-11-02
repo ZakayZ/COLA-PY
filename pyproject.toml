@@ -52,6 +52,29 @@ dev = [
 minimum-version = "build-system.requires"
 cmake.source-dir = "."
 
+sdist.include = [
+    "src/**/*",
+    "cmake/**/*", 
+    "data/**/*",
+    "CMakeLists.txt",
+    "pyproject.toml",
+    "README.md",
+    "LICENSE",
+    "*.cpp", "*.h", "*.hh", "*.hpp",
+    "*.cmake", "*.in",
+]
+
+sdist.exclude = [
+    "**/__pycache__/**",
+    "**/*.pyc",
+    "**/*.so",
+    "**/*.dll", 
+    "**/*.dylib",
+    "build/**",
+    "dist/**",
+    "**/*.egg-info/**",
+]
+
 [tool.cibuildwheel]
 build-frontend = "build"
 enable = ["pypy"]

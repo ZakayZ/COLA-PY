@@ -14,7 +14,12 @@ project(
     LANGUAGES CXX
 )
 
-find_package(COLA)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+find_package(COLA QUIET)
+
+include(cmake/InstallDirectory.cmake)
 
 if (NOT COLA_FOUND)
     include(FetchContent)
@@ -34,7 +39,7 @@ if (NOT COLA_FOUND)
         endif()
     endif()
 
-    message(STATUS "COLA not found ${COLA_INSTALL_PREFIX}")
+    message(STATUS "COLA not found, installing it to \"${COLA_INSTALL_PREFIX}\"")
 
     FetchContent_Declare(
         COLA
@@ -44,39 +49,12 @@ if (NOT COLA_FOUND)
     )
     FetchContent_GetProperties(cola)
 
-    if(NOT COLA_POPULATED)
-        FetchContent_Populate(COLA)
-        
-        execute_process(
-            COMMAND ${CMAKE_COMMAND} 
-                -S ${cola_SOURCE_DIR}
-                -B ${cola_BINARY_DIR}
-                -DCMAKE_INSTALL_PREFIX=${COLA_INSTALL_PREFIX}
-                -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-            RESULT_VARIABLE result
-        )
-        
-        if(result)
-            message(FATAL_ERROR "Failed to configure COLA")
-        endif()
-        
-        execute_process(
-            COMMAND ${CMAKE_COMMAND} --build ${cola_BINARY_DIR}
-            RESULT_VARIABLE result
-        )
-        
-        if(result)
-            message(FATAL_ERROR "Failed to build COLA")
-        endif()
-        
-        execute_process(
-            COMMAND ${CMAKE_COMMAND} --install ${cola_BINARY_DIR}
-            RESULT_VARIABLE result
-        )
-        
-        if(result)
-            message(FATAL_ERROR "Failed to install COLA to ${COLA_INSTALL_PREFIX}")
-        endif()
+    if (NOT COLA_POPULATED)
+        FetchContent_Populate(cola)
+        install_global_cmake("${cola_SOURCE_DIR}" "${cola_BINARY_DIR}" "${COLA_INSTALL_PREFIX}" "${CMAKE_BUILD_TYPE}" COLA_INSTALL_RESULT)
+        if (${COLA_INSTALL_RESULT})
+            message(FATAL_ERROR "COLA: ${COLA_INSTALL_RESULT}")
+        endif ()
 
         message(STATUS "COLA installed successfully to ${COLA_INSTALL_PREFIX}")
 
@@ -84,13 +62,16 @@ if (NOT COLA_FOUND)
     endif()
 endif()
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+install_global_cmake("${CMAKE_SOURCE_DIR}/src" "${CMAKE_BINARY_DIR}/src" "${COLA_DIR}" "${CMAKE_BUILD_TYPE}" COLAPY_INSTALL_RESULT)
+if (COLAPY_INSTALL_RESULT)
+    message(FATAL_ERROR "COLA-Py: ${COLAPY_INSTALL_RESULT}")
+endif ()
 
+# find_package(Python3 COMPONENTS Interpreter Development)
 find_package(pybind11 CONFIG REQUIRED)
 
 pybind11_add_module(
-    _cola_impl 
+    _cola_impl
     src/bindings.cpp
 )
 

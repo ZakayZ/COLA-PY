@@ -10,14 +10,10 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(COLA REQUIRED)
-find_package(pybind11 CONFIG REQUIRED)
+find_package(COLA-Py REQUIRED)
 
 add_executable(
-    embedded_app
+    runner
     main.cpp
-    factory.cpp
-    filters.cpp
-    interpreter_wrapper.cpp
-    ../src/bindings.cpp
 )
-target_link_libraries(embedded_app PUBLIC COLA pybind11::embed)
+target_link_libraries(runner PUBLIC COLA COLA-Py)
