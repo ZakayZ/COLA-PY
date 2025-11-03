@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<program>
+    <generator name="py_generator" class="pylib.Generator"/>
+    <converter name="py_converter" class="pylib.Converter"/>
+    <writer name="py_writer" class="pylib.Writer"/>
+</program>

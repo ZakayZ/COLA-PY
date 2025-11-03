@@ -86,7 +86,19 @@ PYBIND11_MODULE(_cola_impl, m) {
         ;
 
     py::class_<cola::EventIniState>(m, "EventInitialState")
-        .def(py::init<>())
+        .def(py::init<
+            int, int,
+            double, double, double,
+            float, float,
+            int, int, int, int, int, int, int,
+            float, float, float, float,
+            cola::EventParticles>(),
+            "pdg_code_a"_a = 0, "pdg_code_b"_a = 0,
+            "pz_a"_a = 0., "pz_b"_a = 0., "energy"_a = 0.,
+            "sect_nn"_a = 0.f, "b"_a = 0.f,
+            "n_coll"_a = 0, "n_coll_pp"_a = 0, "n_coll_pn"_a = 0, "n_coll_nn"_a = 0, "n_part"_a = 0, "n_part_a"_a = 0, "n_part_b"_a = 0,
+            "phi_rot_a"_a = 0.f, "theta_rot_a"_a = 0.f, "phi_rot_b"_a = 0.f, "theta_rot_b"_a = 0.f,
+            "ini_state_particles"_a = cola::EventParticles())
         .def_readwrite("pdg_code_a", &cola::EventIniState::pdgCodeA,
                       "PDG code of the projectile")
         .def_readwrite("pdg_code_b", &cola::EventIniState::pdgCodeB,
@@ -128,7 +140,8 @@ PYBIND11_MODULE(_cola_impl, m) {
         ;
 
     py::class_<cola::EventData>(m, "EventData")
-        .def(py::init<>())
+        .def(py::init<cola::EventIniState, cola::EventParticles>(),
+            "state"_a = cola::EventIniState(), "particles"_a = cola::EventParticles())
         .def_readwrite("initial_state", &cola::EventData::iniState)
         .def_readwrite("particles", &cola::EventData::particles);
 }
