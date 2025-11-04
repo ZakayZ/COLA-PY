@@ -43,8 +43,8 @@ if (NOT COLA_FOUND)
 
     FetchContent_Declare(
         COLA
-        GIT_REPOSITORY https://github.com/Spectator-matter-group-INR-RAS/COLA.git
-        GIT_TAG main
+        GIT_REPOSITORY https://github.com/ZakayZ/COLA.git
+        GIT_TAG dev
         GIT_SHALLOW TRUE
     )
     FetchContent_GetProperties(cola)
@@ -52,7 +52,7 @@ if (NOT COLA_FOUND)
     if (NOT COLA_POPULATED)
         FetchContent_Populate(cola)
         install_global_cmake("${cola_SOURCE_DIR}" "${cola_BINARY_DIR}" "${COLA_INSTALL_PREFIX}" "${CMAKE_BUILD_TYPE}" COLA_INSTALL_RESULT)
-        if (${COLA_INSTALL_RESULT})
+        if (COLA_INSTALL_RESULT)
             message(FATAL_ERROR "COLA: ${COLA_INSTALL_RESULT}")
         endif ()
 

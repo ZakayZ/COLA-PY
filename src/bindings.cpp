@@ -1,3 +1,4 @@
+#include <optional>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/functional.h>
@@ -9,12 +10,44 @@
 
 #include <sstream>
 #include <memory>
+#include <stdexcept>
+#include <string>
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
 namespace py = pybind11;
 using namespace pybind11::literals;
+
+class COLAPyRunManager{
+public:
+    COLAPyRunManager() = default;
+
+    COLAPyRunManager& loadLibrary(const std::string& libraryPath, const std::string& libraryPrefix = "") {
+        auto plugin = cola::loadLibrary(libraryPath, libraryPrefix != "" ? std::make_optional(libraryPrefix) : std::nullopt);
+        for (auto& [name, filterData] : plugin->getLibraryFilters()) {
+            metaProcessor_.reg(std::move(filterData.first), name, filterData.second);
+        }
+        return *this;
+    }
+
+    COLAPyRunManager& loadConfig(const std::string& configPath) {
+        colaManager_.emplace(metaProcessor_.parse(configPath));
+        return *this;
+    }
+
+    void run(int n) {
+        if (colaManager_.has_value()) {
+            colaManager_->run(n);
+        } else {
+            throw std::runtime_error("The COLAPyRunManager wasn't initialized");
+        }
+    }
+
+private:
+    cola::MetaProcessor metaProcessor_;
+    std::optional<cola::ColaRunManager> colaManager_;
+};
 
 PYBIND11_MODULE(_cola_impl, m) {
     m.doc() = "COLA wrapper library";
@@ -143,5 +176,13 @@ PYBIND11_MODULE(_cola_impl, m) {
         .def(py::init<cola::EventIniState, cola::EventParticles>(),
             "state"_a = cola::EventIniState(), "particles"_a = cola::EventParticles())
         .def_readwrite("initial_state", &cola::EventData::iniState)
-        .def_readwrite("particles", &cola::EventData::particles);
+        .def_readwrite("particles", &cola::EventData::particles)
+        ;
+
+    py::class_<COLAPyRunManager>(m, "RunManager")
+        .def(py::init<>())
+        .def("run", &COLAPyRunManager::run, "n"_a = 1)
+        .def("load_library", &COLAPyRunManager::loadLibrary, "library_path"_a, "library_prefix"_a = "")
+        .def("load_config", &COLAPyRunManager::loadConfig, "config_path"_a)
+        ;
 }

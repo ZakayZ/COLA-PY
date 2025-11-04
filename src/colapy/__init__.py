@@ -10,6 +10,7 @@ from ._cola_impl import (
     ParticleClass,
     EventInitialState,
     EventData,
+    RunManager,
 )
 
 
@@ -45,6 +46,7 @@ __all__ = [
     'ParticleClass',
     'EventInitialState',
     'EventData',
+    'RunManager',
     'GeneratorBase',
     'ConverterBase',
     'WriterBase',
