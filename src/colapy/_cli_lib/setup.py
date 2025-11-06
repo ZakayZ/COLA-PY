@@ -2,13 +2,10 @@ import click
 import jinja2
 import textwrap
 
-from .sources_templates import CMAKE_TEMPLATE, GIT_IGNORE_TEMPLATE
 from pathlib import Path
 
-
-@click.group()
-def cli():
-    pass
+from .common import cli
+from .sources_templates import CMAKE_TEMPLATE, GIT_IGNORE_TEMPLATE
 
 
 @cli.group()

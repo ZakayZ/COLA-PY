@@ -9,22 +9,19 @@ namespace py = pybind11;
 
 std::unique_ptr<PythonFilterBase::PythonHolder> PythonFilterBase::impl_ = nullptr;
 
-class PythonFilterBase::PythonHolder {
-    public:
-        PythonHolder() {
-            if (!Py_IsInitialized()) {
-                guard_ = std::make_unique<py::scoped_interpreter>();
-            }
-        }
-
-    private:
-        std::unique_ptr<py::scoped_interpreter> guard_;
-};
+PythonFilterBase::PythonHolder::PythonHolder() {
+    if (!Py_IsInitialized()) {
+        guard_ = std::make_unique<py::scoped_interpreter>();
+    }
+}
 
 namespace {
     py::object ImportFrom(const std::string_view importPath) {
         auto last_dot = importPath.rfind('.');
         if (last_dot == std::string_view::npos) {
+            if (pybind11::globals().contains(importPath.data())) {
+                return pybind11::globals()[importPath.data()];
+            }
             return py::module_::import(importPath.data());
         }
 

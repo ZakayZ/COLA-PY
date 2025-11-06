@@ -76,6 +76,12 @@ pybind11_add_module(
 )
 
 target_link_libraries(_cola_impl PUBLIC COLA)
+# set(CMAKE_INSTALL_RPATH "@loader_path;${COLA_DIR}")
+message("COLA DIR = ${COLA_DIR} ${CMAKE_INSTALL_RPATH}")
+set_target_properties(_cola_impl PROPERTIES
+    INSTALL_RPATH "@loader_path;${COLA_DIR}/lib"
+    BUILD_WITH_INSTALL_RPATH TRUE
+)
 
 target_compile_definitions(_cola_impl PRIVATE VERSION_INFO=${PROJECT_VERSION})
 

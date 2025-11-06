@@ -1,6 +1,5 @@
 #include <functional>
 #include <memory>
-#include <string_view>
 
 #include <COLA.hh>
 #include <unordered_map>
@@ -9,9 +8,9 @@
 #include "export.hh"
 
 static const std::unordered_map<std::string, std::pair<std::function<cola::VFactory*()>, cola::FilterType>> ModuleFactories = {
-    {"PythonWriterFactory", {[](){ return new cola::python::PythonWriterFactory(); }, cola::FilterType::writer}},
-    {"PythonConverterFactory", {[](){ return new cola::python::PythonConverterFactory(); }, cola::FilterType::converter}},
-    {"PythonGeneratorFactory", {[](){ return new cola::python::PythonGeneratorFactory(); }, cola::FilterType::generator}},
+    {"PythonWriter", {[](){ return new cola::python::PythonWriterFactory(); }, cola::FilterType::writer}},
+    {"PythonConverter", {[](){ return new cola::python::PythonConverterFactory(); }, cola::FilterType::converter}},
+    {"PythonGenerator", {[](){ return new cola::python::PythonGeneratorFactory(); }, cola::FilterType::generator}},
 };
 
 cola::FilterMap cola::COLAPyPlugin::getLibraryFilters() const {

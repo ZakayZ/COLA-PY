@@ -3,8 +3,16 @@ import pprint
 
 
 def to_dict(obj: object) -> object:
-    if isinstance(obj, (int, str, float, dict, list)):
+    if isinstance(obj, (int, str, float)):
         return obj
+
+    if isinstance(obj, list):
+        return [to_dict(el) for el in obj]
+
+    if isinstance(obj, dict):
+        return {
+            to_dict(k): to_dict(v) for k, v in obj.items()
+        }
 
     return {
         el: to_dict(getattr(obj, el))
@@ -34,4 +42,4 @@ class Writer(colapy.WriterBase):
         print(f'init: {self}, {kwargs}')
 
     def __call__(self, event_data: colapy.EventData) -> None:
-        print(pprint.pprint(to_dict(event_data)))
+        pprint.pprint(to_dict(event_data))

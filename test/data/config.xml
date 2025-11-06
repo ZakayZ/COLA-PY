@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <program>
-    <generator name="PythonGeneratorFactory" class="pylib.Generator"/>
-    <converter name="PythonConverterFactory" class="pylib.Converter"/>
-    <writer name="PythonWriterFactory" class="pylib.Writer"/>
+    <generator name="PythonGenerator" class="pylib.Generator"/>
+    <converter name="PythonConverter" class="pylib.Converter"/>
+    <writer name="PythonWriter" class="pylib.Writer"/>
 </program>

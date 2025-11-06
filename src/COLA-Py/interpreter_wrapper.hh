@@ -6,6 +6,7 @@
 
 namespace pybind11 {
     class object;
+    class scoped_interpreter;
 } // namespace pybind11
 
 namespace cola::python {
@@ -21,7 +22,14 @@ namespace cola::python {
         private:
             std::unique_ptr<pybind11::object> importedObject_;
 
-            class PythonHolder;
+            class PythonHolder {
+                public:
+                    PythonHolder();
+
+                private:
+                    std::unique_ptr<pybind11::scoped_interpreter> guard_;
+            };
+
             static std::unique_ptr<PythonHolder> impl_;
     };
 } // namespace cola::python
