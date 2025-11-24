@@ -29,11 +29,11 @@ def project(ctx: click.Context, name: str, prefix: str, version: str, force: boo
         )
 
     try:
-        ctx.invoke(cmake, name, prefix, version)
+        ctx.invoke(cmake, prefix=prefix, name=name, version=version)
 
-        ctx.invoke(sources, name, prefix)
+        ctx.invoke(sources, prefix=prefix, name=name)
 
-        ctx.invoke(git, name, prefix)
+        ctx.invoke(git, prefix=prefix, name=name)
 
         click.echo('✅ Project setup completed successfully!')
 
@@ -47,6 +47,7 @@ def project(ctx: click.Context, name: str, prefix: str, version: str, force: boo
 @click.option('--prefix', default='./', help='Target directory', show_default=True)
 @click.option('--version', default='1.0.0', help='Project version', show_default=True)
 def cmake(name: str, prefix: str, version: str):
+    click.echo(f'Setting up project "{name}" in "{prefix}"')
     root_dir = Path(prefix) / name
     try:
         data_dir = root_dir / 'data'
