@@ -2,13 +2,12 @@
 requires = [
     "scikit-build-core>=0.5",
     "cmake>=3.15",
-    "pybind11",
 ]
 build-backend = "scikit_build_core.build"
 
 [project]
 name = "colapy"
-version = "0.0.2.0"
+version = "0.0.2.4"
 description = "Python binding for COLA framework"
 readme = "README.md"
 license = "MIT"
@@ -37,6 +36,13 @@ dependencies = [
 ]
 requires-python = ">=3.8"
 
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "ruff",
+    "cibuildwheel",
+]
+
 [project.urls]
 Repository = "https://github.com/ZakayZ/COLA-PY"
 
@@ -61,12 +67,13 @@ sdist.include = [
     "src/**/*",
     "cmake/**/*", 
     "data/**/*",
+    "test/**/*",
     "CMakeLists.txt",
     "pyproject.toml",
     "README.md",
     "LICENSE",
-    "*.cpp", "*.h", "*.hh", "*.hpp",
-    "*.cmake", "*.in",
+    # "*.cpp", "*.h", "*.hh", "*.hpp",
+    # "*.cmake", "*.in",
 ]
 
 sdist.exclude = [
