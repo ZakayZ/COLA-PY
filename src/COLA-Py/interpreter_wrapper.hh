@@ -1,35 +1,31 @@
 #pragma once
 
-#include <map>
 #include <memory>
 #include <string>
+#include <unordered_map>
 
 namespace pybind11 {
     class object;
-    class scoped_interpreter;
 } // namespace pybind11
 
 namespace cola::python {
     class PythonFilterBase {
-        public:
-            PythonFilterBase(const std::string_view importPath, const std::map<std::string, std::string>& metaData);
+      public:
+        PythonFilterBase(const std::string& importPath, const std::unordered_map<std::string, std::string>& metaData);
 
-        protected:
-            pybind11::object& object() {
-                return *importedObject_;
-            }
+      protected:
+        pybind11::object& Object() {
+            return *importedObject_;
+        }
 
-        private:
-            std::unique_ptr<pybind11::object> importedObject_;
+      private:
+        class PythonHolder;
+        static std::unique_ptr<PythonHolder> impl;
 
-            class PythonHolder {
-                public:
-                    PythonHolder();
-
-                private:
-                    std::unique_ptr<pybind11::scoped_interpreter> guard_;
-            };
-
-            static std::unique_ptr<PythonHolder> impl_;
+        // default deleter fails for forward-declared classes
+        struct PyObjectDeleter {
+            void operator()(pybind11::object* ptr) const;
+        };
+        std::unique_ptr<pybind11::object, PyObjectDeleter> importedObject_;
     };
 } // namespace cola::python

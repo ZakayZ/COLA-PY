@@ -13,7 +13,7 @@ from ._cli_lib import cli
 def run(config: str, library: tp.List[str], steps: int):
     manager = RunManager()
     for lib in library:
-        manager.load_library(lib, os.path.expanduser('~/.local/lib'))
+        manager.load_module(lib, os.path.expanduser('~/.local/lib'))
     manager.load_config(os.path.expanduser(config))
     manager.run(steps)
 

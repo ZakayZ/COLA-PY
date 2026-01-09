@@ -1,38 +1,50 @@
 #include "interpreter_wrapper.hh"
 
 #include <memory>
-#include <pybind11/embed.h>
 #include <string>
+#include <unordered_map>
+
+#include <pybind11/embed.h>
 
 using namespace cola::python;
 namespace py = pybind11;
 
-std::unique_ptr<PythonFilterBase::PythonHolder> PythonFilterBase::impl_ = nullptr;
+std::unique_ptr<PythonFilterBase::PythonHolder> PythonFilterBase::impl = nullptr;
 
-PythonFilterBase::PythonHolder::PythonHolder() {
-    if (!Py_IsInitialized()) {
-        guard_ = std::make_unique<py::scoped_interpreter>();
+class PythonFilterBase::PythonHolder {
+  public:
+    PythonHolder() {
+        if (Py_IsInitialized() == 0) {
+            guard_ = std::make_unique<py::scoped_interpreter>();
+        }
     }
+
+  private:
+    std::unique_ptr<pybind11::scoped_interpreter> guard_;
+};
+
+void PythonFilterBase::PyObjectDeleter::operator()(pybind11::object* ptr) const {
+    delete ptr;
 }
 
 namespace {
-    py::object ImportFrom(const std::string_view importPath) {
-        auto last_dot = importPath.rfind('.');
-        if (last_dot == std::string_view::npos) {
-            if (pybind11::globals().contains(importPath.data())) {
-                return pybind11::globals()[importPath.data()];
+    py::object ImportFrom(const std::string& importPath) {
+        auto lastDot = importPath.rfind('.');
+        if (lastDot == std::string_view::npos) {
+            if (pybind11::globals().contains(importPath.c_str())) {
+                return pybind11::globals()[importPath.c_str()];
             }
-            return py::module_::import(importPath.data());
+            return py::module_::import(importPath.c_str());
         }
 
-        const auto module_path = importPath.substr(0, last_dot);
-        const auto object_name = importPath.substr(last_dot + 1);
-        py::module_ module = py::module_::import(std::string(module_path).c_str());
-        
-        return module.attr(std::string(object_name).c_str());
+        const auto modulePath = importPath.substr(0, lastDot);
+        const auto objectName = importPath.substr(lastDot + 1);
+        py::module_ module = py::module_::import(modulePath.c_str());
+
+        return module.attr(objectName.c_str());
     }
 
-    py::dict ToPythonDict(const std::map<std::string, std::string>& map) {
+    py::dict ToPythonDict(const std::unordered_map<std::string, std::string>& map) {
         py::dict pythonMap;
         for (const auto& [key, value] : map) {
             pythonMap[py::str(key)] = py::str(value);
@@ -41,11 +53,12 @@ namespace {
     }
 } // anonymous namespace
 
-PythonFilterBase::PythonFilterBase(const std::string_view importPath, const std::map<std::string, std::string>& metaData) {
-    if (impl_ == nullptr) {
-        impl_ = std::make_unique<PythonHolder>();
+PythonFilterBase::PythonFilterBase(const std::string& importPath,
+                                   const std::unordered_map<std::string, std::string>& metaData) {
+    if (impl == nullptr) {
+        impl = std::make_unique<PythonHolder>();
     }
 
-    importedObject_ = std::make_unique<py::object>(ImportFrom(importPath)(**ToPythonDict(metaData)));
+    importedObject_ =
+        std::unique_ptr<py::object, PyObjectDeleter>(new py::object(ImportFrom(importPath)(**ToPythonDict(metaData))));
 }
-

@@ -5,38 +5,28 @@
 using namespace cola::python;
 namespace py = pybind11;
 
-PythonConverter::PythonConverter(
-    const std::string_view importPath,
-    const std::map<std::string, std::string>& metaData
-)
-    : PythonFilterBase(importPath, metaData)
-{
+PythonConverter::PythonConverter(const std::string& importPath,
+                                 const std::unordered_map<std::string, std::string>& metaData)
+    : PythonFilterBase(importPath, metaData) {
 }
 
 std::unique_ptr<cola::EventData> PythonConverter::operator()(std::unique_ptr<cola::EventData>&& data) {
-    return std::make_unique<cola::EventData>(object()(py::cast(std::move(data))).cast<cola::EventData>());
+    return std::make_unique<cola::EventData>(Object()(py::cast(std::move(data))).cast<cola::EventData>());
 }
 
-PythonGenerator::PythonGenerator(
-    const std::string_view importPath,
-    const std::map<std::string, std::string>& metaData
-)
-    : PythonFilterBase(importPath, metaData)
-{
+PythonGenerator::PythonGenerator(const std::string& importPath,
+                                 const std::unordered_map<std::string, std::string>& metaData)
+    : PythonFilterBase(importPath, metaData) {
 }
 
 std::unique_ptr<cola::EventData> PythonGenerator::operator()() {
-    return std::make_unique<cola::EventData>(object()().cast<cola::EventData>());
+    return std::make_unique<cola::EventData>(Object()().cast<cola::EventData>());
 }
 
-PythonWriter::PythonWriter(
-    const std::string_view importPath,
-    const std::map<std::string, std::string>& metaData
-)
-    : PythonFilterBase(importPath, metaData)
-{
+PythonWriter::PythonWriter(const std::string& importPath, const std::unordered_map<std::string, std::string>& metaData)
+    : PythonFilterBase(importPath, metaData) {
 }
 
 void PythonWriter::operator()(std::unique_ptr<cola::EventData>&& data) {
-    object()(py::cast(std::move(data)));
+    Object()(py::cast(std::move(data)));
 }

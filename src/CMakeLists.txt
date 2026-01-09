@@ -18,20 +18,13 @@ include(CMakePackageConfigHelpers)
 set(CMAKE_INSTALL_PREFIX ${COLA_DIR})
 set(COLA_MODULE_NAME COLA-Py)
 
-file(
-    GLOB SRCS
-    COLA-Py/*.cpp
-)
-add_library(
-    COLA-Py SHARED
-    ${SRCS}
-    bindings.cpp # makes casting (py->cpp, cpp->py) possible
+file(GLOB SRCS COLA-Py/*.cpp)
+add_library(COLA-Py SHARED ${SRCS} bindings.cpp # makes casting (py->cpp, cpp->py) possible
 )
 
 target_include_directories(
-    COLA-Py PUBLIC
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/>
-    $<INSTALL_INTERFACE:include/${COLA_MODULE_NAME}>
+    COLA-Py PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/>
+                   $<INSTALL_INTERFACE:include/${COLA_MODULE_NAME}>
 )
 
 # Link against COLA
@@ -45,13 +38,11 @@ set_source_files_properties(bindings.cpp PROPERTIES COMPILE_FLAGS -Wno-self-assi
 configure_package_config_file(
     "${PROJECT_SOURCE_DIR}/data/COLA-PyConfig.cmake.in"
     "${CMAKE_CURRENT_BINARY_DIR}/COLA-PyConfig.cmake"
-    INSTALL_DESTINATION lib/cmake/${COLA_MODULE_NAME}
-    #PATH_VARS, etc.
+    INSTALL_DESTINATION lib/cmake/${COLA_MODULE_NAME} #PATH_VARS, etc.
 )
 
 write_basic_package_version_file(
-    ${CMAKE_CURRENT_BINARY_DIR}/COLA-PyConfigVersion.cmake
-    COMPATIBILITY AnyNewerVersion
+    ${CMAKE_CURRENT_BINARY_DIR}/COLA-PyConfigVersion.cmake COMPATIBILITY AnyNewerVersion
 )
 
 # Install library
@@ -60,7 +51,8 @@ install(
     EXPORT COLA-PyExport
     LIBRARY DESTINATION lib/${COLA_MODULE_NAME}
     PUBLIC_HEADER DESTINATION include/${COLA_MODULE_NAME}
-    INCLUDES DESTINATION include/${COLA_MODULE_NAME}
+    INCLUDES
+    DESTINATION include/${COLA_MODULE_NAME}
 )
 
 # Install includes
@@ -68,17 +60,13 @@ install(
     DIRECTORY COLA-Py
     DESTINATION include
     FILES_MATCHING
-        PATTERN "*.hh"
+    PATTERN "*.hh"
 )
 
 # Install export file and config files
-install(
-    EXPORT COLA-PyExport
-    DESTINATION lib/cmake/${COLA_MODULE_NAME}
-)
+install(EXPORT COLA-PyExport DESTINATION lib/cmake/${COLA_MODULE_NAME})
 
-install(
-    FILES "${CMAKE_CURRENT_BINARY_DIR}/COLA-PyConfig.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/COLA-PyConfigVersion.cmake"
-    DESTINATION lib/cmake/${COLA_MODULE_NAME}
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/COLA-PyConfig.cmake"
+              "${CMAKE_CURRENT_BINARY_DIR}/COLA-PyConfigVersion.cmake"
+        DESTINATION lib/cmake/${COLA_MODULE_NAME}
 )
