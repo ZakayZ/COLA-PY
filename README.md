@@ -1,5 +1,7 @@
 # COLA-PY
 
+[![CI](https://github.com/ZakayZ/COLA-PY/actions/workflows/ci.yml/badge.svg)](https://github.com/ZakayZ/COLA-PY/actions/workflows/ci.yml)
+
 Python обертка над фреймворком COLA.
 
 ## Description
@@ -66,30 +68,32 @@ class JSONWriter(colapy.WriterBase):
 ```
 
 These filters are constructed from the parameters described in the config:
+
 ```xml
 ...
     <writer name="PythonWriter" class="JSONWriter" file="config_out.jsonl"/>
 ...
 ```
+
 All the attributes will be forwarded as kwargs to the constructor.
 
-#### Config
-All python filters must have a `class` attribute, that stores whole path to the python class including module.
-- Class defined in `__main__.py` file should be described as one of: `__main__.FilterName` or just `FilterName`.
-- Class from a library should be described as: `library_name.your_submodule.FilterName`.
-
 ### cola script
+
 `colapy` package installs `cola` utility to your system.
 
 #### Setup
+
 To setup a new COLA module you can run the following command:
+
 ```shell
 cola setup project --name="ModuleName" --prefix="PathToProjectDir" --version="1.0.0"
 ```
 
 #### Run
+
 It is possible to run COLA calculation without the need to write and compile driver C++ code.
 If you have COLA modules installed on your system you can run the calculation using filters exposed by them with the following command:
+
 ```shell
 cola run \
     --config="<path_to_config>/config.xml" \ # config that can use all the filters from the included libraries

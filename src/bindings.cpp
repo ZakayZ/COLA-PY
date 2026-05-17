@@ -1,4 +1,5 @@
 #include <memory>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 
@@ -30,8 +31,14 @@ class COLAPyRunManager {
         return *this;
     }
 
-    COLAPyRunManager& LoadConfig(const std::string& configPath) {
+    COLAPyRunManager& LoadConfigFile(const std::string& configPath) {
         colaManager_.emplace(metaProcessor_.Parse(configPath));
+        return *this;
+    }
+
+    COLAPyRunManager& LoadConfigString(const std::string& configXml) {
+        std::istringstream stream(configXml);
+        colaManager_.emplace(metaProcessor_.Parse(stream));
         return *this;
     }
 
@@ -58,13 +65,13 @@ PYBIND11_MODULE(_cola_impl, mod) {
 #endif
 
     py::native_enum<cola::ParticleClass>(mod, "ParticleClass", "enum.Enum")
-        .value("PRODUCED", cola::ParticleClass::PRODUCED)
-        .value("ELASTIC_A", cola::ParticleClass::ELASTIC_A)
-        .value("ELASTIC_B", cola::ParticleClass::ELASTIC_B)
-        .value("NON_ELASTIC_A", cola::ParticleClass::NONELASTIC_A)
-        .value("NON_ELASTIC_B", cola::ParticleClass::NONELASTIC_B)
-        .value("SPECTATOR_A", cola::ParticleClass::SPECTATOR_A)
-        .value("SPECTATOR_B", cola::ParticleClass::SPECTATOR_B)
+        .value("PRODUCED", cola::ParticleClass::kProduced)
+        .value("ELASTIC_A", cola::ParticleClass::kElasticA)
+        .value("ELASTIC_B", cola::ParticleClass::kElasticB)
+        .value("NON_ELASTIC_A", cola::ParticleClass::kNonelasticA)
+        .value("NON_ELASTIC_B", cola::ParticleClass::kNonelasticB)
+        .value("SPECTATOR_A", cola::ParticleClass::kSpectatorA)
+        .value("SPECTATOR_B", cola::ParticleClass::kSpectatorB)
         .export_values()
         .finalize();
 
@@ -150,5 +157,6 @@ PYBIND11_MODULE(_cola_impl, mod) {
         .def(py::init<>())
         .def("run", &COLAPyRunManager::Run, "n"_a = 1)
         .def("load_module", &COLAPyRunManager::LoadModule, "library_path"_a, "library_prefix"_a = "")
-        .def("load_config", &COLAPyRunManager::LoadConfig, "config_path"_a);
+        .def("load_config_file", &COLAPyRunManager::LoadConfigFile, "config_path"_a)
+        .def("load_config_xml", &COLAPyRunManager::LoadConfigString, "config_xml"_a);
 }

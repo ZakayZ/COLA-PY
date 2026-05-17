@@ -1,6 +1,13 @@
 import colapy
 import pprint
 
+class Writer(colapy.WriterBase):
+    def __init__(self, **kwargs: dict[str, str]) -> None:
+        print(f'init: {self}, {kwargs}')
+
+    def __call__(self, event_data: colapy.EventData) -> None:
+        pprint.pprint(to_dict(event_data))
+
 
 def to_dict(obj: object) -> object:
     if isinstance(obj, (int, str, float)):
@@ -35,11 +42,3 @@ class Converter(colapy.ConverterBase):
 
     def __call__(self, event_data: colapy.EventData) -> colapy.EventData:
         return event_data
-
-
-class Writer(colapy.WriterBase):
-    def __init__(self, **kwargs: dict[str, str]) -> None:
-        print(f'init: {self}, {kwargs}')
-
-    def __call__(self, event_data: colapy.EventData) -> None:
-        pprint.pprint(to_dict(event_data))

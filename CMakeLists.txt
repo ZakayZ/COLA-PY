@@ -43,8 +43,8 @@ if (NOT COLA_FOUND)
 
     FetchContent_Declare(
         COLA
-        GIT_REPOSITORY https://github.com/ZakayZ/COLA.git
-        GIT_TAG dev
+        GIT_REPOSITORY https://github.com/Spectator-matter-group-INR-RAS/COLA.git
+        GIT_TAG main
         GIT_SHALLOW TRUE
     )
     FetchContent_GetProperties(cola)
@@ -93,5 +93,4 @@ target_compile_definitions(_cola_impl PRIVATE VERSION_INFO=${PROJECT_VERSION})
 
 install(TARGETS _cola_impl DESTINATION ${SKBUILD_PROJECT_NAME})
 
-# Setup code quality tools (clang-format, cmake-format)
-include(cmake/SetupCodeQuality.cmake)
+setup_cola_quality_tools(EXCLUDE_PATTERNS ".*/build-test/.*")
