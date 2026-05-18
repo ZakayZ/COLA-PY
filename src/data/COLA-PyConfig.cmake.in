@@ -3,5 +3,5 @@
 find_package(COLA REQUIRED)
 find_package(pybind11 CONFIG REQUIRED)
 
-include(@CMAKE_INSTALL_PREFIX@/lib/cmake/COLA-Py/COLA-PyExport.cmake)
+include(@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/cmake/@PROJECT_NAME@/@PROJECT_NAME@Export.cmake)
 #set_and_check(...), etc.

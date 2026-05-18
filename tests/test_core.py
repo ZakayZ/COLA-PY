@@ -25,7 +25,7 @@ def pipeline_config_xml(
 """
 
 
-def run_pipeline(config_xml: str, steps: int = 1):
+def run_pipeline(config_xml: str, steps: int = 1) -> None:
     filters.RECORDS.clear()
     manager = colapy.RunManager()
     manager.load_module('COLA-Py')
@@ -33,7 +33,7 @@ def run_pipeline(config_xml: str, steps: int = 1):
     manager.run(steps)
 
 
-def test_python_pipeline():
+def test_python_pipeline() -> None:
     run_pipeline(pipeline_config_xml())
 
     assert len(filters.RECORDS) == 1
@@ -44,10 +44,8 @@ def test_python_pipeline():
     assert event.particles[0].momentum.e == pytest.approx(15.0)
 
 
-def test_python_pipeline_multiple_steps():
-    config_xml = pipeline_config_xml(momentum_e='1.0', delta_e='2.0')
-
-    run_pipeline(config_xml, steps=3)
+def test_python_pipeline_multiple_steps() -> None:
+    run_pipeline(pipeline_config_xml(momentum_e='1.0', delta_e='2.0'), steps=3)
 
     assert len(filters.RECORDS) == 3
     assert all(event.particles[0].momentum.e == pytest.approx(3.0) for event in filters.RECORDS)

@@ -7,26 +7,21 @@ namespace py = pybind11;
 
 PythonConverter::PythonConverter(const std::string& importPath,
                                  const std::unordered_map<std::string, std::string>& metaData)
-    : PythonFilterBase(importPath, metaData) {
-}
+    : PythonFilterBase(importPath, metaData) {}
 
 std::unique_ptr<cola::EventData> PythonConverter::operator()(std::unique_ptr<cola::EventData>&& data) {
-    return std::make_unique<cola::EventData>(Object()(py::cast(std::move(data))).cast<cola::EventData>());
+  return std::make_unique<cola::EventData>(Object()(py::cast(std::move(data))).cast<cola::EventData>());
 }
 
 PythonGenerator::PythonGenerator(const std::string& importPath,
                                  const std::unordered_map<std::string, std::string>& metaData)
-    : PythonFilterBase(importPath, metaData) {
-}
+    : PythonFilterBase(importPath, metaData) {}
 
 std::unique_ptr<cola::EventData> PythonGenerator::operator()() {
-    return std::make_unique<cola::EventData>(Object()().cast<cola::EventData>());
+  return std::make_unique<cola::EventData>(Object()().cast<cola::EventData>());
 }
 
 PythonWriter::PythonWriter(const std::string& importPath, const std::unordered_map<std::string, std::string>& metaData)
-    : PythonFilterBase(importPath, metaData) {
-}
+    : PythonFilterBase(importPath, metaData) {}
 
-void PythonWriter::operator()(std::unique_ptr<cola::EventData>&& data) {
-    Object()(py::cast(std::move(data)));
-}
+void PythonWriter::operator()(std::unique_ptr<cola::EventData>&& data) { Object()(py::cast(std::move(data))); }

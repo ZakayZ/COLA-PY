@@ -14,9 +14,6 @@ project(
     LANGUAGES CXX
 )
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 find_package(COLA QUIET)
 
 include(cmake/InstallDirectory.cmake)
@@ -65,32 +62,23 @@ if (NOT COLA_FOUND)
     endif ()
 endif ()
 
-install_global_cmake(
-    "${CMAKE_SOURCE_DIR}/src" "${CMAKE_BINARY_DIR}/src" "${COLA_DIR}" "${CMAKE_BUILD_TYPE}"
-    COLAPY_INSTALL_RESULT
-)
-if (COLAPY_INSTALL_RESULT)
-    message(FATAL_ERROR "COLA-Py: ${COLAPY_INSTALL_RESULT}")
-endif ()
+find_package(COLA REQUIRED)
 
-# set(PYBIND11_FINDPYTHON ON)
-find_package(Python3 COMPONENTS Interpreter Development)
+set(PYBIND11_FINDPYTHON ON)
 find_package(pybind11 CONFIG REQUIRED)
 
 pybind11_add_module(_cola_impl src/bindings.cpp)
 
+target_compile_features(_cola_impl PRIVATE cxx_std_17)
 target_link_libraries(_cola_impl PUBLIC COLA)
-# set(CMAKE_INSTALL_RPATH "@loader_path;${COLA_DIR}")
-message("COLA DIR = ${COLA_DIR} ${CMAKE_INSTALL_RPATH}")
 set_target_properties(
     _cola_impl
     PROPERTIES INSTALL_RPATH "@loader_path;${COLA_DIR}/lib"
                BUILD_WITH_INSTALL_RPATH TRUE
                CXX_CLANG_TIDY "${COLA_CMAKE_CXX_CLANG_TIDY}"
 )
-
 target_compile_definitions(_cola_impl PRIVATE VERSION_INFO=${PROJECT_VERSION})
 
 install(TARGETS _cola_impl DESTINATION ${SKBUILD_PROJECT_NAME})
 
-setup_cola_quality_tools(EXCLUDE_PATTERNS ".*/build-test/.*")
+setup_cola_quality_tools()

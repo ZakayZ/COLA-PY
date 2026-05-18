@@ -1,72 +1,65 @@
 cmake_minimum_required(VERSION 3.15)
 project(COLA-Py VERSION 1.0.0)
 
-# c++17 is recommended
-set(CMAKE_CXX_STANDARD 17)
+find_package(COLA REQUIRED)
 
-# Find COLA package
-find_package(COLA)
-# find_package(Python3 COMPONENTS Interpreter Development)
+set(PYBIND11_FINDPYTHON ON)
 find_package(pybind11 CONFIG REQUIRED)
 
-# Include CMake module for config file generation
 include(CMakePackageConfigHelpers)
 
-# Modules can be installed whenever you please, however grouping them all in COLA directory is neat and
-# makes further adjustments to CMAKE_PREFIX_PATH unnecessary. It is also advised to put module files to corresponding
-# directories to avoid pollution.
 set(CMAKE_INSTALL_PREFIX ${COLA_DIR})
 set(COLA_MODULE_NAME COLA-Py)
 
-file(GLOB SRCS COLA-Py/*.cpp)
-add_library(COLA-Py SHARED ${SRCS} bindings.cpp # makes casting (py->cpp, cpp->py) possible
-)
+file(GLOB SRCS ${COLA_MODULE_NAME}/*.cpp)
+add_library(${COLA_MODULE_NAME} SHARED ${SRCS} bindings.cpp)
+
+target_compile_features(${COLA_MODULE_NAME} PUBLIC cxx_std_17)
 
 target_include_directories(
-    COLA-Py PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/>
-                   $<INSTALL_INTERFACE:include/${COLA_MODULE_NAME}>
+    ${COLA_MODULE_NAME} PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/>
+                               $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${COLA_MODULE_NAME}>
 )
 
-# Link against COLA
-target_link_libraries(COLA-Py PUBLIC COLA pybind11::embed)
+target_link_libraries(${COLA_MODULE_NAME} PUBLIC COLA pybind11::embed)
 
-# Fun begins
-target_compile_options(COLA-Py PRIVATE -Wall -Werror -Wfloat-conversion -Wextra -Wpedantic)
+target_compile_options(
+    ${COLA_MODULE_NAME} PRIVATE -Wall -Werror -Wfloat-conversion -Wextra -Wpedantic
+)
 set_source_files_properties(bindings.cpp PROPERTIES COMPILE_FLAGS -Wno-self-assign-overloaded)
 
-# Configure config files
 configure_package_config_file(
-    "${PROJECT_SOURCE_DIR}/data/COLA-PyConfig.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/COLA-PyConfig.cmake"
-    INSTALL_DESTINATION lib/cmake/${COLA_MODULE_NAME} #PATH_VARS, etc.
+    "${PROJECT_SOURCE_DIR}/data/${COLA_MODULE_NAME}Config.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/${COLA_MODULE_NAME}Config.cmake"
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${COLA_MODULE_NAME}
 )
 
 write_basic_package_version_file(
-    ${CMAKE_CURRENT_BINARY_DIR}/COLA-PyConfigVersion.cmake COMPATIBILITY AnyNewerVersion
+    ${CMAKE_CURRENT_BINARY_DIR}/${COLA_MODULE_NAME}ConfigVersion.cmake
+    COMPATIBILITY AnyNewerVersion
 )
 
-# Install library
 install(
-    TARGETS COLA-Py
-    EXPORT COLA-PyExport
-    LIBRARY DESTINATION lib/${COLA_MODULE_NAME}
-    PUBLIC_HEADER DESTINATION include/${COLA_MODULE_NAME}
+    TARGETS ${COLA_MODULE_NAME}
+    EXPORT ${COLA_MODULE_NAME}Export
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/${COLA_MODULE_NAME}
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${COLA_MODULE_NAME}
     INCLUDES
-    DESTINATION include/${COLA_MODULE_NAME}
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${COLA_MODULE_NAME}
 )
 
-# Install includes
 install(
-    DIRECTORY COLA-Py
-    DESTINATION include
+    DIRECTORY ${COLA_MODULE_NAME}
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
     FILES_MATCHING
     PATTERN "*.hh"
 )
 
-# Install export file and config files
-install(EXPORT COLA-PyExport DESTINATION lib/cmake/${COLA_MODULE_NAME})
+install(EXPORT ${COLA_MODULE_NAME}Export
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${COLA_MODULE_NAME}
+)
 
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/COLA-PyConfig.cmake"
-              "${CMAKE_CURRENT_BINARY_DIR}/COLA-PyConfigVersion.cmake"
-        DESTINATION lib/cmake/${COLA_MODULE_NAME}
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${COLA_MODULE_NAME}Config.cmake"
+              "${CMAKE_CURRENT_BINARY_DIR}/${COLA_MODULE_NAME}ConfigVersion.cmake"
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${COLA_MODULE_NAME}
 )
