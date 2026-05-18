@@ -16,8 +16,6 @@ project(
 
 find_package(COLA QUIET)
 
-include(cmake/InstallDirectory.cmake)
-
 if (NOT COLA_FOUND)
     include(FetchContent)
     include(GNUInstallDirs)
@@ -48,13 +46,6 @@ if (NOT COLA_FOUND)
 
     if (NOT COLA_POPULATED)
         FetchContent_Populate(cola)
-        install_global_cmake(
-            "${cola_SOURCE_DIR}" "${cola_BINARY_DIR}" "${COLA_INSTALL_PREFIX}"
-            "${CMAKE_BUILD_TYPE}" COLA_INSTALL_RESULT
-        )
-        if (COLA_INSTALL_RESULT)
-            message(FATAL_ERROR "COLA: ${COLA_INSTALL_RESULT}")
-        endif ()
 
         message(STATUS "COLA installed successfully to ${COLA_INSTALL_PREFIX}")
 
@@ -81,4 +72,6 @@ target_compile_definitions(_cola_impl PRIVATE VERSION_INFO=${PROJECT_VERSION})
 
 install(TARGETS _cola_impl DESTINATION ${SKBUILD_PROJECT_NAME})
 
-setup_cola_quality_tools()
+if (NOT SKBUILD)
+    setup_cola_quality_tools()
+endif ()
