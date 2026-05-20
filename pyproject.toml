@@ -1,14 +1,13 @@
 [build-system]
 requires = [
     "scikit-build-core>=0.5",
-    "cmake>=3.15",
     "pybind11-global>=3.0",
 ]
 build-backend = "scikit_build_core.build"
 
 [project]
 name = "colapy"
-version = "0.9.0"
+version = "1.0.0"
 description = "Python binding for COLA framework"
 readme = "README.md"
 license = "MIT"
@@ -34,6 +33,7 @@ keywords = [
 ]
 dependencies = [
     'click',
+    'jinja2',
 ]
 requires-python = ">=3.8"
 
@@ -68,7 +68,7 @@ sdist.include = [
     "src/**/*",
     "cmake/**/*", 
     "data/**/*",
-    "test/**/*",
+    "tests/**/*",
     "CMakeLists.txt",
     "pyproject.toml",
     "README.md",
@@ -91,9 +91,10 @@ sdist.exclude = [
 [tool.cibuildwheel]
 build-frontend = "build"
 enable = ["pypy"]
-# test-command = "python -m pytest tests"
-# test-sources = ["pyproject.toml", "tests"]
-# test-groups = ["test"]
+test-command = "python -m pytest tests"
+test-sources = ["pyproject.toml", "tests"]
+test-groups = ["test"]
+test-skip = "*-pp*"
 
 [tool.ruff]
 line-length = 120
@@ -117,3 +118,7 @@ ignore = [
 
 [tool.ruff.isort]
 known-first-party = ["colapy"]
+
+[tool.pytest.ini_options]
+pythonpath = ["tests"]
+testpaths = ["tests"]

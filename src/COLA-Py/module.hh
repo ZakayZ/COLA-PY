@@ -5,6 +5,6 @@
 #include <COLA.hh>
 
 namespace cola {
-    using COLAPyModule =
-        GenericModule<python::PythonWriterFactory, python::PythonConverterFactory, python::PythonGeneratorFactory>;
-} // namespace cola
+  using COLAPyModule =
+      GenericModule<python::PythonWriterFactory, python::PythonConverterFactory, python::PythonGeneratorFactory>;
+}  // namespace cola

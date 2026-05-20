@@ -17,4 +17,3 @@ RUN pip install --no-cache-dir \
 WORKDIR /workspace
 
 CMD ["/bin/bash"]
-
