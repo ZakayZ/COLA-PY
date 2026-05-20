@@ -18,7 +18,7 @@ class LorentzVector:
 
     @tp.overload
     def __init__(self, other: 'LorentzVector') -> None: ...
-    
+
     @tp.overload
     def __init__(
         self,
@@ -72,7 +72,7 @@ class Particle:
         position: LorentzVector = ...,
         momentum: LorentzVector = ...,
         pdg_code: int = ...,
-        p_class: ParticleClass = ..., 
+        p_class: ParticleClass = ...,
     ) -> None: ...
     def get_az(self) -> AZ: ...
 
