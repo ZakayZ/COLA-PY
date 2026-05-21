@@ -58,7 +58,7 @@ find_package(COLA REQUIRED)
 include(GNUInstallDirs)
 
 set(PYBIND11_FINDPYTHON ON)
-find_package(pybind11 CONFIG REQUIRED)
+find_package(pybind11 REQUIRED)
 
 enable_testing()
 add_subdirectory(src)

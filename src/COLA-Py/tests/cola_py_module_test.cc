@@ -94,8 +94,8 @@ TEST(COLAPyModuleTest, FiltersProcessKwargsFromXml) {
 
   auto event = (*ensemble.generator)();
   ASSERT_NE(event, nullptr);
-  EXPECT_EQ(event->iniState.pdgCodeA, 42);
-  EXPECT_EQ(event->iniState.pdgCodeB, 2212);
+  EXPECT_EQ(event->ini_state.pdg_code_a, 42);
+  EXPECT_EQ(event->ini_state.pdg_code_b, 2212);
   EXPECT_FLOAT_EQ(event->particles[0].momentum.e, 3.0f);
 
   auto converted = (*ensemble.converters[0])(std::move(event));

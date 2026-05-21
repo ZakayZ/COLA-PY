@@ -38,8 +38,8 @@ def test_python_pipeline() -> None:
 
     assert len(filters.RECORDS) == 1
     event = filters.RECORDS[0]
-    assert event.initial_state.pdg_code_a == 1000073
-    assert event.initial_state.pdg_code_b == 2212
+    assert event.ini_state.pdg_code_a == 1000073
+    assert event.ini_state.pdg_code_b == 2212
     assert len(event.particles) == 1
     assert event.particles[0].momentum.e == pytest.approx(15.0)
 

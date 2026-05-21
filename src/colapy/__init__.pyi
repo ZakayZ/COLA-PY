@@ -80,55 +80,55 @@ class Particle:
 class EventInitialState:
     pdg_code_a: int
     pdg_code_b: int
-    pz_a: float
-    pz_b: float
+    p_za: float
+    p_zb: float
     energy: float
     sect_nn: float
     b: float
-    n_coll: int
-    n_coll_pp: int
-    n_coll_pn: int
-    n_coll_nn: int
-    n_part: int
-    n_part_a: int
-    n_part_b: int
+    num_coll: int
+    num_coll_pp: int
+    num_coll_pn: int
+    num_coll_nn: int
+    num_part: int
+    num_part_a: int
+    num_part_b: int
     phi_rot_a: float
     theta_rot_a: float
     phi_rot_b: float
     theta_rot_b: float
-    initial_particles: EventParticles
+    ini_state_particles: EventParticles
 
     def __init__(
         self,
         pdg_code_a: int= ...,
         pdg_code_b: int= ...,
-        pz_a: float = ...,
-        pz_b: float = ...,
+        p_za: float = ...,
+        p_zb: float = ...,
         energy: float = ...,
         sect_nn: float = ...,
         b: float = ...,
-        n_coll: int= ...,
-        n_coll_pp: int= ...,
-        n_coll_pn: int= ...,
-        n_coll_nn: int= ...,
-        n_part: int= ...,
-        n_part_a: int= ...,
-        n_part_b: int= ...,
+        num_coll: int= ...,
+        num_coll_pp: int= ...,
+        num_coll_pn: int= ...,
+        num_coll_nn: int= ...,
+        num_part: int= ...,
+        num_part_a: int= ...,
+        num_part_b: int= ...,
         phi_rot_a: float = ...,
         theta_rot_a: float = ...,
         phi_rot_b: float = ...,
         theta_rot_b: float = ...,
-        initial_particles: EventParticles = list(),
+        ini_state_particles: EventParticles = list(),
     ) -> None: ...
 
 
 class EventData:
-    initial_state: EventInitialState
+    ini_state: EventInitialState
     particles: EventParticles
 
     def __init__(
         self,
-        initial_state: EventInitialState = ...,
+        ini_state: EventInitialState = ...,
         particles: EventParticles = ...,
     ) -> None: ...
 
