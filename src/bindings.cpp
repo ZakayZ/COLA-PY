@@ -120,14 +120,14 @@ PYBIND11_MODULE(_cola_impl, mod) {
   py::class_<cola::EventIniState>(mod, "EventInitialState")
       .def(py::init<int, int, double, double, double, float, float, int, int, int, int, int, int, int, float, float,
                     float, float, cola::EventParticles>(),
-           "pdg_code_a"_a = 0, "pdg_code_b"_a = 0, "p_za"_a = 0., "p_zb"_a = 0., "energy"_a = 0., "sect_nn"_a = 0.f,
+           "pdg_code_a"_a = 0, "pdg_code_b"_a = 0, "pz_a"_a = 0., "pz_b"_a = 0., "energy"_a = 0., "sect_nn"_a = 0.f,
            "b"_a = 0.f, "num_coll"_a = 0, "num_coll_pp"_a = 0, "num_coll_pn"_a = 0, "num_coll_nn"_a = 0,
            "num_part"_a = 0, "num_part_a"_a = 0, "num_part_b"_a = 0, "phi_rot_a"_a = 0.f, "theta_rot_a"_a = 0.f,
            "phi_rot_b"_a = 0.f, "theta_rot_b"_a = 0.f, "ini_state_particles"_a = cola::EventParticles())
       .def_readwrite("pdg_code_a", &cola::EventIniState::pdg_code_a, "PDG code of the projectile")
       .def_readwrite("pdg_code_b", &cola::EventIniState::pdg_code_b, "PDG code of the target")
-      .def_readwrite("p_za", &cola::EventIniState::p_za, "Axial momentum of the projectile")
-      .def_readwrite("p_zb", &cola::EventIniState::p_zb, "Axial momentum of the target")
+      .def_readwrite("pz_a", &cola::EventIniState::pz_a, "Axial momentum of the projectile")
+      .def_readwrite("pz_b", &cola::EventIniState::pz_b, "Axial momentum of the target")
       .def_readwrite("energy", &cola::EventIniState::energy, "Incident energy of the event")
       .def_readwrite("sect_nn", &cola::EventIniState::sect_nn, "Nucleon-Nucleon cross section from generator")
       .def_readwrite("b", &cola::EventIniState::b, "Impact parameter of the event")
@@ -136,8 +136,7 @@ PYBIND11_MODULE(_cola_impl, mod) {
       .def_readwrite("num_coll_pn", &cola::EventIniState::num_coll_pn, "Number of proton-neutron collisions")
       .def_readwrite("num_coll_nn", &cola::EventIniState::num_coll_nn, "Number of neutron-neutron collisions")
       .def_readwrite("num_part", &cola::EventIniState::num_part, "Total number of participants")
-      .def_readwrite("num_part_a", &cola::EventIniState::num_part_a,
-                     "Number of participants from projectile nucleus")
+      .def_readwrite("num_part_a", &cola::EventIniState::num_part_a, "Number of participants from projectile nucleus")
       .def_readwrite("num_part_b", &cola::EventIniState::num_part_b, "Number of participants from target nucleus")
       .def_readwrite("phi_rot_a", &cola::EventIniState::phi_rot_a, "Polar angle φ of rotation of projectile nucleon")
       .def_readwrite("theta_rot_a", &cola::EventIniState::theta_rot_a,

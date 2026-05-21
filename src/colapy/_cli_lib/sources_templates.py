@@ -35,7 +35,14 @@ target_include_directories(
 )
 
 # Set public header
-set_target_properties("${COLA_MODULE_NAME}" PROPERTIES PUBLIC_HEADER "include/${COLA_MODULE_NAME}.hh")
+set_target_properties(
+    "${COLA_MODULE_NAME}"
+    PROPERTIES PUBLIC_HEADER "include/${COLA_MODULE_NAME}.hh"
+               VERSION "${PROJECT_VERSION}"
+               SOVERSION "${PROJECT_VERSION_MAJOR}"
+               BUILD_WITH_INSTALL_RPATH TRUE
+               INSTALL_RPATH_USE_LINK_PATH TRUE 
+)
 
 # Link against COLA
 target_link_libraries("${COLA_MODULE_NAME}" PUBLIC COLA)

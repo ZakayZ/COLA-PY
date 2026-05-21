@@ -80,8 +80,8 @@ class Particle:
 class EventInitialState:
     pdg_code_a: int
     pdg_code_b: int
-    p_za: float
-    p_zb: float
+    pz_a: float
+    pz_b: float
     energy: float
     sect_nn: float
     b: float
@@ -102,8 +102,8 @@ class EventInitialState:
         self,
         pdg_code_a: int= ...,
         pdg_code_b: int= ...,
-        p_za: float = ...,
-        p_zb: float = ...,
+        pz_a: float = ...,
+        pz_b: float = ...,
         energy: float = ...,
         sect_nn: float = ...,
         b: float = ...,

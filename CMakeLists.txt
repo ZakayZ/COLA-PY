@@ -69,7 +69,7 @@ if (SKBUILD)
     target_compile_features(_cola_impl PRIVATE cxx_std_17)
     target_link_libraries(_cola_impl PUBLIC COLA)
     set_target_properties(
-        _cola_impl PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE BUILD_WITH_INSTALL_RPATH TRUE
+        _cola_impl PROPERTIES BUILD_WITH_INSTALL_RPATH TRUE INSTALL_RPATH_USE_LINK_PATH TRUE
     )
     target_compile_definitions(_cola_impl PRIVATE VERSION_INFO=${PROJECT_VERSION})
 

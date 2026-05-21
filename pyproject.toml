@@ -7,7 +7,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "colapy"
-version = "1.0.0"
+version = "1.0.0.1"
 description = "Python binding for COLA framework"
 readme = "README.md"
 license = "MIT"
@@ -61,9 +61,8 @@ dev = [
 ]
 
 [tool.scikit-build]
-minimum-version = "0.9"
+minimum-version = "0.10"
 cmake.source-dir = "."
-cmake.verbose = true
 
 sdist.include = [
     "src/**/*",
