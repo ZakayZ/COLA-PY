@@ -1,4 +1,5 @@
-#pragma once
+#ifndef COLA_PY_INTERPRETER_WRAPPER_HH
+#define COLA_PY_INTERPRETER_WRAPPER_HH
 
 #include <memory>
 #include <string>
@@ -9,24 +10,24 @@ namespace pybind11 {
 }  // namespace pybind11
 
 namespace cola::python {
-  namespace detail {
-    struct PythonInterpreterState;
-  }
-
   class PythonFilterBase {
    public:
-    PythonFilterBase(const std::string& importPath, const std::unordered_map<std::string, std::string>& metaData);
+    PythonFilterBase(const std::string& import_path, const std::unordered_map<std::string, std::string>& meta_data);
 
    protected:
-    pybind11::object& Object() { return *importedObject_; }
+    pybind11::object& Object() { return *imported_object_; }
 
    private:
-    static std::unique_ptr<detail::PythonInterpreterState> impl;
+    struct PythonInterpreterState;
+
+    static std::unique_ptr<PythonInterpreterState> impl_;
 
     // default deleter fails for forward-declared classes
     struct PyObjectDeleter {
       void operator()(pybind11::object* ptr) const;
     };
-    std::unique_ptr<pybind11::object, PyObjectDeleter> importedObject_;
+    std::unique_ptr<pybind11::object, PyObjectDeleter> imported_object_;
   };
 }  // namespace cola::python
+
+#endif  // COLA_PY_INTERPRETER_WRAPPER_HH

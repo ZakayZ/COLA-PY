@@ -8,45 +8,61 @@ on:
 
 jobs:
   test:
-    name: Test Python ${{ matrix.python-version }}
+    name: Tests (${{ matrix.os }} - Python 3.11)
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
-        python-version: ['3.11']
 
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout COLA-PY
+        uses: actions/checkout@v6
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Checkout COLA
+        uses: actions/checkout@v6
+        with:
+          repository: Spectator-matter-group-INR-RAS/COLA
+          ref: main
+          path: COLA
+
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: '3.11'
 
       - name: Install system dependencies (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential cmake git
+          sudo apt-get install -y build-essential cmake git libgtest-dev
 
       - name: Install system dependencies (macOS)
         if: matrix.os == 'macos-latest'
         run: |
-          brew install cmake
+          brew install cmake googletest coreutils
+          echo "$(brew --prefix coreutils)/libexec/gnubin" >> "$GITHUB_PATH"
 
-      - name: Install build dependencies
+      - name: Build and install COLA
+        working-directory: COLA
+        run: |
+          cmake --preset release -DCMAKE_INSTALL_PREFIX="~/.local"
+          cmake --build --preset release --parallel "$(nproc)"
+          cmake --install build/release
+
+      - name: Install colapy
         run: |
           python -m pip install --upgrade pip
-          pip install build pytest
+          pip install pytest pybind11
+          pip install -v .
 
-      - name: Build package
+      - name: Run COLA-Py C++ tests
         run: |
-          python -m build --wheel
+          export Python3_EXECUTABLE="$(python -c 'import sys; print(sys.executable)')"
+          export Python3_ROOT_DIR="$(python -c 'import sys; print(sys.prefix)')"
+          export pybind11_DIR="$(python -m pybind11 --cmakedir)"
+          export CMAKE_BUILD_PARALLEL_LEVEL="$(nproc)"
+          cmake --workflow release-test
 
-      - name: Install package
-        run: |
-          pip install dist/*.whl
-
-      - name: Run tests
+      - name: Run Python tests
         run: python -m pytest tests -v

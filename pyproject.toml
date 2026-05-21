@@ -1,6 +1,6 @@
 [build-system]
 requires = [
-    "scikit-build-core>=0.5",
+    "scikit-build-core>=0.10",
     "pybind11-global>=3.0",
 ]
 build-backend = "scikit_build_core.build"
@@ -61,7 +61,7 @@ dev = [
 ]
 
 [tool.scikit-build]
-minimum-version = "build-system.requires"
+minimum-version = "0.10"
 cmake.source-dir = "."
 
 sdist.include = [

@@ -1,7 +1,7 @@
 @PACKAGE_INIT@
 
-find_package(COLA REQUIRED)
-find_package(pybind11 CONFIG REQUIRED)
+include(CMakeFindDependencyMacro)
+find_dependency(COLA REQUIRED)
+find_dependency(pybind11 CONFIG REQUIRED)
 
-include(@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/cmake/@PROJECT_NAME@/@PROJECT_NAME@Export.cmake)
-#set_and_check(...), etc.
+include("${CMAKE_CURRENT_LIST_DIR}/COLA-PyExport.cmake")

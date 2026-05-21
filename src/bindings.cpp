@@ -21,37 +21,37 @@ class COLAPyRunManager {
  public:
   COLAPyRunManager() = default;
 
-  COLAPyRunManager& LoadModule(const std::string& libraryPath, const std::string& libraryPrefix = "") {
+  COLAPyRunManager& LoadModule(const std::string& library_path, const std::string& library_prefix = "") {
     auto plugin =
-        cola::LoadModule(libraryPath, !libraryPrefix.empty() ? std::make_optional(libraryPrefix) : std::nullopt);
+        cola::LoadModule(library_path, !library_prefix.empty() ? std::make_optional(library_prefix) : std::nullopt);
     for (auto& [name, factory] : plugin->GetModuleFilters()) {
-      metaProcessor_.Register(std::move(factory), name);
+      meta_processor_.Register(std::move(factory), name);
     }
     return *this;
   }
 
-  COLAPyRunManager& LoadConfigFile(const std::string& configPath) {
-    colaManager_.emplace(metaProcessor_.Parse(configPath));
+  COLAPyRunManager& LoadConfigFile(const std::string& config_path) {
+    cola_manager_.emplace(meta_processor_.Parse(config_path));
     return *this;
   }
 
-  COLAPyRunManager& LoadConfigString(const std::string& configXml) {
-    std::istringstream stream(configXml);
-    colaManager_.emplace(metaProcessor_.Parse(stream));
+  COLAPyRunManager& LoadConfigString(const std::string& config_xml) {
+    std::istringstream stream(config_xml);
+    cola_manager_.emplace(meta_processor_.Parse(stream));
     return *this;
   }
 
   void Run(int n) {
-    if (colaManager_.has_value()) {
-      colaManager_->Run(n);
+    if (cola_manager_.has_value()) {
+      cola_manager_->Run(n);
     } else {
       throw std::runtime_error("The COLAPyRunManager wasn't initialized");
     }
   }
 
  private:
-  cola::MetaProcessor metaProcessor_;
-  std::optional<cola::ColaRunManager> colaManager_;
+  cola::MetaProcessor meta_processor_;
+  std::optional<cola::ColaRunManager> cola_manager_;
 };
 
 PYBIND11_MODULE(_cola_impl, mod) {
@@ -92,7 +92,7 @@ PYBIND11_MODULE(_cola_impl, mod) {
       .def(py::self * double())
       .def(py::self / double())
       .def(py::self == py::self)  // NOLINT(misc-redundant-expression)
-    //   .def(-py::self)
+      // .def(-py::self)
       .def("__copy__", [](const cola::LorentzVector& vec) { return vec; })
       .def(
           "__deepcopy__", [](const cola::LorentzVector& vec, const py::dict&) { return vec; }, "memo"_a)

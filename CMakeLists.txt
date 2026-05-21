@@ -55,23 +55,30 @@ endif ()
 
 find_package(COLA REQUIRED)
 
+include(GNUInstallDirs)
+
 set(PYBIND11_FINDPYTHON ON)
 find_package(pybind11 CONFIG REQUIRED)
 
-pybind11_add_module(_cola_impl src/bindings.cpp)
+enable_testing()
+add_subdirectory(src)
 
-target_compile_features(_cola_impl PRIVATE cxx_std_17)
-target_link_libraries(_cola_impl PUBLIC COLA)
-set_target_properties(
-    _cola_impl
-    PROPERTIES INSTALL_RPATH "@loader_path;${COLA_DIR}/lib"
-               BUILD_WITH_INSTALL_RPATH TRUE
-               CXX_CLANG_TIDY "${COLA_CMAKE_CXX_CLANG_TIDY}"
-)
-target_compile_definitions(_cola_impl PRIVATE VERSION_INFO=${PROJECT_VERSION})
+if (SKBUILD)
+    pybind11_add_module(_cola_impl src/bindings.cpp)
 
-install(TARGETS _cola_impl DESTINATION ${SKBUILD_PROJECT_NAME})
+    target_compile_features(_cola_impl PRIVATE cxx_std_17)
+    target_link_libraries(_cola_impl PUBLIC COLA)
+    set_target_properties(
+        _cola_impl PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE BUILD_WITH_INSTALL_RPATH TRUE
+    )
+    target_compile_definitions(_cola_impl PRIVATE VERSION_INFO=${PROJECT_VERSION})
 
-if (NOT SKBUILD)
-    setup_cola_quality_tools()
+    install(TARGETS _cola_impl DESTINATION ${SKBUILD_PROJECT_NAME})
+else ()
+    set(COLA_CMAKE_CXX_CLANG_TIDY
+        ""
+        CACHE STRING "Passed to CMAKE_CXX_CLANG_TIDY for COLA-Py targets"
+    )
+
+    setup_cola_quality_tools(".*/COLA/.*")
 endif ()
