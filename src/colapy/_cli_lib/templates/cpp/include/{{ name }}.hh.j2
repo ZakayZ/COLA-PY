@@ -1,0 +1,23 @@
+#pragma once
+
+#include <COLA.hh>
+#include <memory>
+
+namespace {{ package }} {
+class Generator : public cola::VGenerator {
+ public:
+  std::unique_ptr<cola::EventData> operator()() override;
+};
+
+class Converter : public cola::VConverter {
+ public:
+  std::unique_ptr<cola::EventData> operator()(std::unique_ptr<cola::EventData>&& data) override;
+};
+
+class Writer : public cola::VWriter {
+ public:
+  void operator()(std::unique_ptr<cola::EventData>&& data) override;
+};
+}  // namespace {{ package }}
+
+extern "C" cola::VModule* LoadCOLAModule();

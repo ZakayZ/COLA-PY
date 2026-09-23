@@ -63,11 +63,48 @@ shipping a standalone conda package requires separate packaging and relocation v
 
 #### Setup
 
-To setup a new COLA module you can run the following command:
+Generate a project scaffold with imports, Generator/Converter/Writer declarations, build files
+and language-specific code-quality configuration. Add your own implementations
+and pipeline configuration:
 
 ```shell
-cola setup project --name="ModuleName" --prefix="PathToProjectDir" --version="1.0.0"
+cola setup project --name=MyCpp --language=cpp --prefix=./projects
+cola setup project --name=MyPython --language=python --prefix=./projects
+cola setup project --name=MyFortran --language=fortran --prefix=./projects
+cola setup project --name=MyJava --language=java --prefix=./projects
 ```
+
+`--language` defaults to `cpp`; `--version` defaults to `1.0.0`. Project names must
+start with an ASCII letter and contain up to 32 letters, digits or underscores.
+The destination is `<prefix>/<name>`. Existing projects are not overwritten unless
+`--force` is supplied; unrelated files are preserved, and symlinks are never overwritten.
+
+| Language | Based on | Build and quality tooling |
+| --- | --- | --- |
+| C++ | COLA-min-example | CMake presets, ClangFormat, Clang-Tidy |
+| Python | COLA-PY/example and tests | `pyproject.toml`, src layout, Ruff |
+| Fortran | COLA_Fortran/example and COLA_UrQMD | `add_cola_fortran_library`, CMake presets, fprettify |
+| Java | COLA_JVM/examples/java-scaler | CMake presets, Gradle, Checkstyle, javac lint |
+
+Each language has separate `.j2` files in `src/colapy/_cli_lib/templates/`.
+The CLI renders file paths and contents using the project name, package name and version.
+All projects include `.editorconfig`, `.gitignore`, and a README with build and
+quality-check commands. Native projects have their own `CMakeLists.txt` and CMake
+formatting configuration. C++ compiles declarations into an object target.
+Fortran uses `add_cola_fortran_library`, following COLA_UrQMD, to generate wrappers
+and build an installable shared module. Its concrete types bind to procedure stubs
+in `contains`, as in UrQMD; fill in the bodies before running a pipeline.
+Java uses `add_cola_gradle_library` to build and install the native module and JAR
+with all three classes registered; implement them before running a pipeline.
+The Python classes are also abstract,
+with ellipsis stubs. No sample implementations or pipeline XML are generated.
+The READMEs explain implementation and module registration for each language.
+Fortran and Java need the corresponding installed COLA_Fortran/COLA_JVM bridge;
+the generator does not install them. Python uses the installed COLA-Py module.
+
+The existing `cola setup cmake`, `cola setup sources`, and `cola setup git` commands
+remain available for generating individual parts of a project. `setup cmake` is
+for native languages; Python uses `pyproject.toml`.
 
 #### Run
 
@@ -88,6 +125,21 @@ To install locally from source run from the repo root
 ```shell
 pip install -e .
 ```
+
+The generator tests run with `python -m pytest tests`. To also compile the
+generated C++, Fortran and Java projects, install both language bridges into a test
+prefix and enable the native integration tests:
+
+```shell
+COLA_DIR="/path/to/test/cola" \
+COLA_GENERATOR_TEST_PREFIX="/path/to/test/cola" \
+  python -m pytest tests
+```
+
+These tests require Ninja, Gradle, a JDK and compatible C++/Fortran compilers on PATH.
+Set `CC`, `CXX` and `FC` explicitly if multiple toolchains are installed.
+The Fortran and Java integration tests supply minimal implementations in temporary
+projects to verify registration, shared-library build, installation and CLI execution.
 
 ### Publish
 

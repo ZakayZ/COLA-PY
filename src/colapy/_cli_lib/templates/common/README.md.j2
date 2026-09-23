@@ -1,0 +1,83 @@
+# {{ name }}
+
+{{ language }} project scaffold, version {{ version }}.
+The sources contain imports and declarations for Generator, Converter and Writer.
+Implement the methods before registering a filter or adding a pipeline configuration.
+{% if language == "python" %}
+
+Sources: `src/{{ package }}/filters.py`. Each abstract class has a `__call__` signature
+with an ellipsis stub. Provide concrete implementations and remove their
+`@abc.abstractmethod` decorators, or subclass them. No pipeline XML or example
+implementation is generated.
+
+```sh
+python -m pip install -e '.[dev]'
+ruff check .
+ruff format --check .
+```
+
+The build is configured in `pyproject.toml`; no CMake project is needed.
+{% else %}
+
+The project has its own `CMakeLists.txt` and release/debug presets.
+Requires COLA, CMake 3.20+, Ninja and a C++ compiler.
+{% if language == "cpp" %}
+Declarations: `include/{{ name }}.hh`. Add definitions in `src/{{ name }}.cc`.
+The initial OBJECT target checks the header. After implementing the filters,
+factory registration and `LoadCOLAModule`, switch the target to SHARED and enable
+installation as indicated in CMakeLists.txt.
+{% elif language == "fortran" %}
+Declarations: `src/{{ name }}.f90`. Requires COLA_Fortran and a compatible Fortran
+compiler. Like COLA_UrQMD, the concrete types extend the COLA abstract base types
+and bind `init`/`run` to module procedures in `contains`. Procedure stubs contain
+argument declarations and TODO comments only, with no executable logic.
+The build already uses `add_cola_fortran_library`, as in COLA_UrQMD, to generate
+wrappers and register all three filters. Fill in the procedure bodies before
+running a pipeline, including `err` and the generator's returned `EventData`.
+Then build and install with `cmake --install build/release --prefix /path/to/cola`.
+{% elif language == "java" %}
+Declarations: `{{ name }}Generator.java`, `{{ name }}Converter.java` and
+`{{ name }}Writer.java` in `src/main/java/org/cola/generated/{{ package }}/`.
+Requires COLA_JVM, a JDK 17+ and Gradle 8.5+. The build uses
+`add_cola_gradle_library` to build the JAR and native module, register all three
+classes, and install both artifacts. The API JAR stays a compile-only dependency.
+Implement the methods and remove `abstract` from the registered classes and methods
+before running the module; keep the classes publicly constructible without arguments.
+{% endif %}
+
+```sh
+export CMAKE_PREFIX_PATH="/absolute/path/to/cola"
+cmake --preset release
+cmake --build --preset release
+```
+
+{% if language == "fortran" %}
+CMake generates the wrappers. Empty procedure stubs are not functional filters;
+implement them before running. Installation places the shared module in `lib/{{ name }}`
+(or the platform's `CMAKE_INSTALL_LIBDIR`).
+{% elif language == "java" %}
+Install with `cmake --install build/release --prefix /path/to/cola`.
+The native library and JAR are installed together in `lib/{{ name }}` (or the
+platform's `CMAKE_INSTALL_LIBDIR`). Abstract declarations compile, but cannot be
+instantiated when a pipeline runs.
+{% else %}
+The scaffold compiles declarations; it is not yet a loadable COLA module.
+{% endif %}
+
+Code quality:
+
+```sh
+python -m pip install cmakelang PyYAML
+cmake-format --check CMakeLists.txt
+{% if language == "cpp" %}
+# Install clang-format and clang-tidy separately.
+clang-format --dry-run --Werror include/*.hh src/*.cc
+clang-tidy -p build/release src/*.cc
+{% elif language == "fortran" %}
+python -m pip install fprettify configargparse
+fprettify -c .fprettify.rc -r src
+{% elif language == "java" %}
+gradle --no-daemon -PcolaJvmApi="/absolute/path/to/cola/lib/COLA_JVM/cola-jvm-api.jar" check
+{% endif %}
+```
+{% endif %}
