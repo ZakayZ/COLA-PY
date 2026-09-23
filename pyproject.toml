@@ -7,7 +7,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "colapy"
-version = "1.0.0.1"
+version = "1.0.0.2"
 description = "Python binding for COLA framework"
 readme = "README.md"
 license = "MIT"
@@ -92,7 +92,7 @@ sdist.exclude = [
 build-frontend = "build"
 enable = ["pypy"]
 test-command = "python -m pytest tests"
-test-sources = ["pyproject.toml", "tests"]
+test-sources = ["pyproject.toml", "tests", "cmake"]
 test-groups = ["test"]
 test-skip = "*-pp*"
 

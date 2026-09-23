@@ -14,46 +14,7 @@ project(
     LANGUAGES CXX
 )
 
-find_package(COLA QUIET)
-
-if (NOT COLA_FOUND)
-    include(FetchContent)
-    include(GNUInstallDirs)
-
-    if (NOT DEFINED COLA_INSTALL_PREFIX)
-        if (DEFINED ENV{COLA_INSTALL_PREFIX})
-            set(COLA_INSTALL_PREFIX "$ENV{COLA_INSTALL_PREFIX}")
-            list(APPEND CMAKE_PREFIX_PATH ${COLA_INSTALL_PREFIX})
-        else ()
-            # Default to user's local directory (cross-platform)
-            if (WIN32)
-                set(COLA_INSTALL_PREFIX "$ENV{USERPROFILE}/.local")
-            else ()
-                set(COLA_INSTALL_PREFIX "$ENV{HOME}/.local")
-            endif ()
-        endif ()
-    endif ()
-
-    message(STATUS "COLA not found, installing it to \"${COLA_INSTALL_PREFIX}\"")
-
-    FetchContent_Declare(
-        COLA
-        GIT_REPOSITORY https://github.com/Spectator-matter-group-INR-RAS/COLA.git
-        GIT_TAG main
-        GIT_SHALLOW TRUE
-    )
-    FetchContent_GetProperties(cola)
-
-    if (NOT COLA_POPULATED)
-        FetchContent_Populate(cola)
-
-        message(STATUS "COLA installed successfully to ${COLA_INSTALL_PREFIX}")
-
-        find_package(COLA REQUIRED)
-    endif ()
-endif ()
-
-find_package(COLA REQUIRED)
+include(cmake/FindOrInstallCOLA.cmake)
 
 include(GNUInstallDirs)
 
