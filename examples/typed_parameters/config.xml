@@ -1,0 +1,4 @@
+<program>
+    <generator name="PythonGenerator" class="energy_filters.Generator" energy="10ev" pdg_code="22"/>
+    <writer name="PythonWriter" class="energy_filters.Writer"/>
+</program>

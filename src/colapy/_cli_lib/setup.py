@@ -1,6 +1,7 @@
 """Generate COLA project scaffolds using the shipped language templates."""
 
 import re
+import uuid
 from pathlib import Path
 
 import click
@@ -9,7 +10,12 @@ from jinja2 import Environment, StrictUndefined
 from .common import cli
 
 TEMPLATES = Path(__file__).with_name("templates")
-LANGUAGES = click.Choice(["cpp", "python", "fortran", "java"], case_sensitive=False)
+LANGUAGES = click.Choice(["cpp", "python", "fortran", "java", "julia"], case_sensitive=False)
+JULIA_RESERVED_NAMES = set(
+    "baremodule begin break catch const continue do else elseif end export false finally for function "
+    "global if import let local macro module quote return struct true try using while "
+    "abstract mutable primitive type where in isa public outer as COLA Core Base".split()
+)
 
 
 def project_name(ctx, param, value):
@@ -26,9 +32,15 @@ def project_version(ctx, param, value):
 
 def render_project(name, language, version):
     environment = Environment(undefined=StrictUndefined, keep_trailing_newline=True, autoescape=False)
-    context = {"name": name, "package": name.lower() + "_filters", "version": version, "language": language}
+    context = {
+        "name": name,
+        "package": name.lower() + "_filters",
+        "version": version,
+        "language": language,
+        "uuid": str(uuid.uuid4()),
+    }
     groups = ["common"]
-    if language != "python":
+    if language in ("cpp", "fortran", "java"):
         groups.append("quality")
     groups.append(language)
     files = {}
@@ -41,10 +53,15 @@ def render_project(name, language, version):
 
 
 def write_project(name, prefix, version, language, force, section=None):
+    if language == "julia" and name in JULIA_RESERVED_NAMES:
+        raise click.ClickException(f"Reserved Julia module name: {name}")
     files = render_project(name, language, version)
     if section == "cmake":
-        if language == "python":
-            raise click.ClickException("Python projects use pyproject.toml; use 'setup project --language python'.")
+        if language in ("python", "julia"):
+            build_file = "pyproject.toml" if language == "python" else "Project.toml"
+            raise click.ClickException(
+                f"{language} projects use {build_file}; use 'setup project --language {language}'."
+            )
         files = {p: text for p, text in files.items() if "cmake" in p.lower() or p == "CMakeLists.txt"}
     elif section == "sources":
         files = {p: text for p, text in files.items() if p.startswith(("src/", "include/"))}
@@ -68,6 +85,17 @@ def write_project(name, prefix, version, language, force, section=None):
         if target.exists() and (target.is_dir() or not force):
             raise click.ClickException(f"File already exists: {target}. Use --force to overwrite generated files.")
     try:
+        if language == "julia" and "Project.toml" in files and (root / "Project.toml").is_file():
+            header = (root / "Project.toml").read_text(encoding="utf-8").split("[", 1)[0]
+            match = re.search(r'^uuid\s*=\s*"([^"]+)"', header, re.MULTILINE)
+            if match:
+                try:
+                    project_uuid = str(uuid.UUID(match[1]))
+                except ValueError as error:
+                    raise click.ClickException("Invalid UUID in existing Project.toml") from error
+                files["Project.toml"] = re.sub(
+                    r'^uuid = ".*"', f'uuid = "{project_uuid}"', files["Project.toml"], flags=re.MULTILINE
+                )
         for relative, content in files.items():
             target = root / relative
             target.parent.mkdir(parents=True, exist_ok=True)
@@ -105,7 +133,7 @@ def setup():
 @setup.command()
 @options
 def project(**kwargs):
-    """Create a C++, Python, Fortran or Java project scaffold."""
+    """Create a C++, Python, Fortran, Java or Julia project scaffold."""
     write_project(**kwargs)
 
 

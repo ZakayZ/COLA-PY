@@ -1,6 +1,7 @@
 """Scaffold import/build tests; native builds opt in with COLA_GENERATOR_TEST_PREFIX."""
 
 import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -24,6 +25,28 @@ def run(command, root, env):
     result = subprocess.run(command, cwd=root, env=env, capture_output=True, text=True, timeout=300)
     assert result.returncode == 0, result.stdout + result.stderr
     return result.stdout
+
+
+@pytest.mark.skipif(shutil.which("julia") is None, reason="Julia is required to parse the generated package")
+def test_generated_julia_syntax(tmp_path):
+    root, name = generate(tmp_path, "julia")
+    run(
+        [
+            "julia",
+            "--startup-file=no",
+            "-e",
+            'using TOML, UUIDs; project = TOML.parsefile("Project.toml"); '
+            f'@assert project["name"] == "{name}"; '
+            'UUID(project["uuid"]); '
+            '@assert project["deps"]["COLA"] == "e8fb5d31-b8d4-4e67-9fe8-a5a2e74aa831"; '
+            "function valid(x); x isa Expr || return true; "
+            "return !(x.head in (:error, :incomplete)) && all(valid, x.args); end; "
+            f'@assert valid(Meta.parseall(read("src/{name}.jl", String))); '
+            'TOML.parsefile(".JuliaFormatter.toml"); println("Julia syntax verified")',
+        ],
+        root,
+        os.environ.copy(),
+    )
 
 
 def implement_fortran_test_filters(source):

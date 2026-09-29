@@ -17,6 +17,24 @@ ruff format --check .
 ```
 
 The build is configured in `pyproject.toml`; no CMake project is needed.
+{% elif language == "julia" %}
+
+Julia package: `Project.toml` and `src/{{ name }}.jl`. Requires Julia 1.10+ and COLA_Julia.
+From the generated directory, resolve the local COLA package:
+
+```sh
+julia --project=. -e 'using Pkg; Pkg.develop(path="/absolute/path/to/COLA_Julia"); Pkg.instantiate()'
+julia --project=. -e 'using {{ name }}'
+```
+
+Implement `COLA.generate!`, `COLA.convert!` and `COLA.write!` before running a pipeline.
+The types have no callback implementations yet. No CMake project or XML is generated.
+Use `JULIA_PROJECT` to select this environment and load `COLA_Julia` with the COLA CLI.
+Factory names are `julia_generator`, `julia_converter`, `julia_writer`; filter paths
+are `{{ name }}.{{ name }}Generator`, `{{ name }}.{{ name }}Converter`, `{{ name }}.{{ name }}Writer`.
+
+`.JuliaFormatter.toml` configures JuliaFormatter. With JuliaFormatter installed in
+a tooling environment, run `using JuliaFormatter; format("/path/to/{{ name }}")`.
 {% else %}
 
 The project has its own `CMakeLists.txt` and release/debug presets.

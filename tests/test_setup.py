@@ -1,3 +1,5 @@
+import uuid
+
 import pytest
 from click.testing import CliRunner
 
@@ -7,6 +9,7 @@ from colapy.cli import cli
 @pytest.mark.parametrize(
     "language,expected_files",
     [
+        ("julia", {"Project.toml", ".JuliaFormatter.toml", "src/My_Project42.jl"}),
         (
             "cpp",
             {
@@ -72,6 +75,7 @@ def test_generate_complete_file_manifest(tmp_path, language, expected_files):
 @pytest.mark.parametrize(
     "language,source,quality",
     [
+        ("julia", "src/Demo.jl", ".JuliaFormatter.toml"),
         ("cpp", "src/Demo.cc", ".clang-tidy"),
         ("python", "src/demo_filters/filters.py", "pyproject.toml"),
         ("fortran", "src/Demo.f90", ".fprettify.rc"),
@@ -97,9 +101,13 @@ def test_generate_project(tmp_path, language, source, quality):
     assert not (root / "config.xml").exists()
     assert not (root / "tests").exists()
     assert ".ruff_cache" not in (root / ".gitignore").read_text()
-    build_file = root / ("pyproject.toml" if language == "python" else "CMakeLists.txt")
+    build_file = root / {"python": "pyproject.toml", "julia": "Project.toml"}.get(language, "CMakeLists.txt")
     assert "2.3.4" in build_file.read_text()
-    assert (root / "CMakeLists.txt").exists() == (language != "python")
+    assert (root / "CMakeLists.txt").exists() == (language in ("cpp", "fortran", "java"))
+    if language == "julia":
+        for role in ("Generator", "Converter", "Writer"):
+            assert f"struct Demo{role} <: COLA.{role} end" in (root / source).read_text()
+        assert not (root / "CMakePresets.json").exists()
     if language == "cpp":
         header = (root / "include/Demo.hh").read_text()
         assert 'extern "C" cola::VModule* LoadCOLAModule();' in header
@@ -190,3 +198,37 @@ def test_legacy_component_commands(tmp_path):
     assert (tmp_path / "Demo/CMakeLists.txt").exists()
     assert (tmp_path / "Demo/src/Demo.cc").exists()
     assert (tmp_path / "Demo/.gitignore").exists()
+
+
+def test_julia_uuid_and_force(tmp_path):
+    runner = CliRunner()
+    args = ["setup", "project", "--language", "julia", "--name", "Demo", "--prefix", str(tmp_path)]
+    assert runner.invoke(cli, args).exit_code == 0
+    project = tmp_path / "Demo/Project.toml"
+    original = project.read_text()
+    uuid_line = next(line for line in original.splitlines() if line.startswith("uuid ="))
+    assert uuid.UUID(uuid_line.split('"')[1]).version == 4
+    assert runner.invoke(cli, args + ["--force"]).exit_code == 0
+    assert project.read_text() == original
+    assert runner.invoke(cli, args[:-1] + [str(tmp_path / "another")]).exit_code == 0
+    assert (tmp_path / "another/Demo/Project.toml").read_text() != original
+
+
+@pytest.mark.parametrize("name", ["module", "end", "COLA", "Base"])
+def test_julia_reserved_name(tmp_path, name):
+    result = CliRunner().invoke(
+        cli, ["setup", "project", "--language", "julia", "--name", name, "--prefix", str(tmp_path)]
+    )
+    assert result.exit_code != 0
+    assert not list(tmp_path.iterdir())
+
+
+def test_julia_component_commands(tmp_path):
+    runner = CliRunner()
+    args = ["--language", "julia", "--name", "Demo", "--prefix", str(tmp_path)]
+    result = runner.invoke(cli, ["setup", "cmake", *args])
+    assert result.exit_code != 0
+    assert "Project.toml" in result.output
+    assert not list(tmp_path.iterdir())
+    assert runner.invoke(cli, ["setup", "sources", *args]).exit_code == 0
+    assert (tmp_path / "Demo/src/Demo.jl").is_file()
