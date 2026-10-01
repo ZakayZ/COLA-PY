@@ -31,6 +31,22 @@ class Converter(colapy.ConverterBase):
         return event_data
 
 
+class UnsafeGenerator:
+    def __init__(self, **kwargs: str) -> None:
+        del kwargs
+
+    def __call__(self, event_data: colapy.EventData) -> None:
+        event_data.ini_state.energy = 3.0
+
+
+class UnsafeConverter:
+    def __init__(self, **kwargs: str) -> None:
+        self._delta_e = float(kwargs.get('delta_e', '5.0'))
+
+    def __call__(self, event_data: colapy.EventData) -> None:
+        event_data.ini_state.energy += self._delta_e
+
+
 class Writer(colapy.WriterBase):
     def __init__(self, **kwargs: str) -> None:
         del kwargs

@@ -16,6 +16,12 @@ cola run --config config.xml --library COLA-Py
 
 Use an XML configuration referring to your installed filters.
 
+`GeneratorBase` transfers its returned event to COLA, without a copy.
+`ConverterBase` and `WriterBase` receive Python-owned events, which may be
+retained. For zero-copy in-place filters, use ordinary Python classes with
+`__call__(event)` and the XML factory names `PythonUnsafeGenerator` and
+`PythonUnsafeConverter`; borrowed events must not escape their callback.
+
 ## Project setup
 
 Create a project with Generator, Converter and Writer stubs:

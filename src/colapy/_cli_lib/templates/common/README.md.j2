@@ -20,12 +20,15 @@ The build is configured in `pyproject.toml`; no CMake project is needed.
 {% elif language == "julia" %}
 
 Julia package: `Project.toml` and `src/{{ name }}.jl`. Requires Julia 1.10+ and COLA_Julia.
-From the generated directory, resolve the local COLA package:
+From the generated directory, install the registered COLA package:
 
 ```sh
-julia --project=. -e 'using Pkg; Pkg.develop(path="/absolute/path/to/COLA_Julia"); Pkg.instantiate()'
+julia --project=. -e 'using Pkg; Pkg.add("COLA"); Pkg.instantiate()'
 julia --project=. -e 'using {{ name }}'
 ```
+
+Before COLA is registered, replace `Pkg.add("COLA")` with
+`Pkg.develop(path="/absolute/path/to/COLA_Julia")`.
 
 Implement `COLA.generate!`, `COLA.convert!` and `COLA.write!` before running a pipeline.
 The types have no callback implementations yet. No CMake project or XML is generated.

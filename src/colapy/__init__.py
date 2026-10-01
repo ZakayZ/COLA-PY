@@ -34,6 +34,8 @@ class AZ(tp.NamedTuple):
 
 
 class GeneratorBase(abc.ABC):
+    """COLA takes ownership of the returned event."""
+
     @abc.abstractmethod
     def __call__(self) -> EventData:
         raise NotImplementedError

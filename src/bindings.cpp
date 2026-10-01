@@ -146,7 +146,7 @@ PYBIND11_MODULE(_cola_impl, mod) {
       .def_readwrite("ini_state_particles", &cola::EventIniState::ini_state_particles,
                      "Array of all particles just before the event");
 
-  py::class_<cola::EventData>(mod, "EventData")
+  py::class_<cola::EventData, py::smart_holder>(mod, "EventData")
       .def(py::init<cola::EventIniState, cola::EventParticles>(), "ini_state"_a = cola::EventIniState(),
            "particles"_a = cola::EventParticles())
       .def_readwrite("ini_state", &cola::EventData::ini_state)
