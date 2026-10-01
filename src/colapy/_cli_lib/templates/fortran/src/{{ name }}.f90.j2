@@ -1,0 +1,73 @@
+module {{ package }}
+    use cola, only: AbstractFortranGenerator, AbstractFortranConverter, AbstractFortranWriter, &
+                    EventData, ParametersMap
+    implicit none
+    private
+
+    type, public, extends(AbstractFortranGenerator) :: Generator
+    contains
+        procedure :: init => generator_init
+        procedure :: run => generator_run
+    end type Generator
+
+    type, public, extends(AbstractFortranConverter) :: Converter
+    contains
+        procedure :: init => converter_init
+        procedure :: run => converter_run
+    end type Converter
+
+    type, public, extends(AbstractFortranWriter) :: Writer
+    contains
+        procedure :: init => writer_init
+        procedure :: run => writer_run
+    end type Writer
+
+contains
+    subroutine generator_init(self, pmap, err)
+        class(Generator), intent(inout) :: self
+        type(ParametersMap), intent(in) :: pmap
+        character(len=:), allocatable, intent(out) :: err
+
+        ! TODO: Implement this procedure and assign its output arguments.
+    end subroutine generator_init
+
+    function generator_run(self, err) result(ed)
+        class(Generator), intent(in) :: self
+        character(len=:), allocatable, intent(out) :: err
+        type(EventData) :: ed
+
+        ! TODO: Implement this procedure and assign its output arguments.
+    end function generator_run
+
+    subroutine converter_init(self, pmap, err)
+        class(Converter), intent(inout) :: self
+        type(ParametersMap), intent(in) :: pmap
+        character(len=:), allocatable, intent(out) :: err
+
+        ! TODO: Implement this procedure and assign its output arguments.
+    end subroutine converter_init
+
+    subroutine converter_run(self, ed, err)
+        class(Converter), intent(in) :: self
+        type(EventData), intent(inout) :: ed
+        character(len=:), allocatable, intent(out) :: err
+
+        ! TODO: Implement this procedure and assign its output arguments.
+    end subroutine converter_run
+
+    subroutine writer_init(self, pmap, err)
+        class(Writer), intent(inout) :: self
+        type(ParametersMap), intent(in) :: pmap
+        character(len=:), allocatable, intent(out) :: err
+
+        ! TODO: Implement this procedure and assign its output arguments.
+    end subroutine writer_init
+
+    subroutine writer_run(self, ed, err)
+        class(Writer), intent(in) :: self
+        type(EventData), intent(in) :: ed
+        character(len=:), allocatable, intent(out) :: err
+
+        ! TODO: Implement this procedure and assign its output arguments.
+    end subroutine writer_run
+end module {{ package }}

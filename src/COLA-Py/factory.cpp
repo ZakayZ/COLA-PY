@@ -27,6 +27,16 @@ std::unique_ptr<cola::VFilter> PythonConverterFactory::Create(
   return CreatePythonFilter<PythonConverter>(meta_data);
 }
 
+std::unique_ptr<cola::VFilter> PythonUnsafeGeneratorFactory::Create(
+    const std::unordered_map<std::string, std::string>& meta_data) {
+  return CreatePythonFilter<PythonUnsafeGenerator>(meta_data);
+}
+
+std::unique_ptr<cola::VFilter> PythonUnsafeConverterFactory::Create(
+    const std::unordered_map<std::string, std::string>& meta_data) {
+  return CreatePythonFilter<PythonUnsafeConverter>(meta_data);
+}
+
 std::unique_ptr<cola::VFilter> PythonWriterFactory::Create(
     const std::unordered_map<std::string, std::string>& meta_data) {
   return CreatePythonFilter<PythonWriter>(meta_data);

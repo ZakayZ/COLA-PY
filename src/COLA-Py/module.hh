@@ -6,7 +6,8 @@
 #include <COLA.hh>
 
 namespace cola::python {
-  using COLAPyModule = GenericModule<PythonWriterFactory, PythonConverterFactory, PythonGeneratorFactory>;
+  using COLAPyModule = GenericModule<PythonWriterFactory, PythonConverterFactory, PythonGeneratorFactory,
+                                     PythonUnsafeConverterFactory, PythonUnsafeGeneratorFactory>;
 }  // namespace cola::python
 
 #endif  // COLA_PY_MODULE_HH

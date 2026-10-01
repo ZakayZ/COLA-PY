@@ -1,0 +1,17 @@
+module {{ name }}
+
+import COLA
+
+struct {{ name }}Generator <: COLA.Generator end
+struct {{ name }}Converter <: COLA.Converter end
+struct {{ name }}Writer <: COLA.Writer end
+
+# Implement these callbacks; events are modified in place:
+# COLA.generate!(filter::{{ name }}Generator, event)
+# COLA.convert!(filter::{{ name }}Converter, event)
+# COLA.write!(filter::{{ name }}Writer, event)
+
+# Declare configurable fields with COLA.parameters(::Type{YourFilter}) and
+# COLA.parameter(Type; default=value), and provide a keyword constructor.
+
+end

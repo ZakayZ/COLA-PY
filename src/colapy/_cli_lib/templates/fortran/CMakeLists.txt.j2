@@ -1,0 +1,63 @@
+cmake_minimum_required(
+    VERSION
+        3.20
+)
+project(
+    {{ name }}
+    VERSION
+        {{ version }}
+    LANGUAGES
+        CXX
+        Fortran
+)
+find_package(
+    COLA_Fortran
+    CONFIG
+    REQUIRED
+)
+include(
+    GNUInstallDirs
+)
+
+# Fill in the filter procedure bodies before running the module.
+add_cola_fortran_library(
+    {{ name }}
+    SOURCES
+    src/{{ name }}.f90
+)
+target_include_directories(
+    {{ name }}
+    PRIVATE
+        "${CMAKE_CURRENT_BINARY_DIR}/generated"
+        "${CMAKE_CURRENT_BINARY_DIR}/modules"
+)
+set_target_properties(
+    {{ name }}
+    PROPERTIES
+        VERSION
+        "${PROJECT_VERSION}"
+        SOVERSION
+        "${PROJECT_VERSION_MAJOR}"
+        INSTALL_RPATH_USE_LINK_PATH
+        TRUE
+)
+if (CMAKE_Fortran_COMPILER_ID
+    STREQUAL
+    "GNU"
+)
+    target_compile_options(
+        {{ name }}
+        PRIVATE
+            "$<$<COMPILE_LANGUAGE:Fortran>:-Wall;-Wextra;-Wimplicit-interface>"
+            "$<$<AND:$<COMPILE_LANGUAGE:Fortran>,$<CONFIG:Debug>>:-fcheck=all;-fbacktrace>"
+    )
+endif (
+
+)
+install(
+    TARGETS
+        {{ name }}
+    LIBRARY
+        DESTINATION
+            ${CMAKE_INSTALL_LIBDIR}/{{ name }}
+)

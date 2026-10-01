@@ -1,0 +1,51 @@
+cmake_minimum_required(
+    VERSION
+        3.20
+)
+project(
+    {{ name }}
+    VERSION
+        {{ version }}
+    LANGUAGES
+        CXX
+)
+find_package(
+    COLA
+    CONFIG
+    REQUIRED
+)
+
+# Compile the declarations. Switch OBJECT to SHARED after implementing the module.
+add_library(
+    {{ name }}
+    OBJECT
+    src/{{ name }}.cc
+)
+target_compile_features(
+    {{ name }}
+    PUBLIC
+        cxx_std_17
+)
+target_include_directories(
+    {{ name }}
+    PUBLIC
+        "${CMAKE_CURRENT_SOURCE_DIR}/include"
+)
+target_link_libraries(
+    {{ name }}
+    PUBLIC
+        COLA
+)
+target_compile_options(
+    {{ name }}
+    PRIVATE
+        "$<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wall;-Wextra;-Wpedantic>"
+)
+set_target_properties(
+    {{ name }}
+    PROPERTIES
+        POSITION_INDEPENDENT_CODE
+        TRUE
+)
+# Once the target is SHARED and LoadCOLAModule is defined:
+# install(TARGETS {{ name }} LIBRARY DESTINATION lib/{{ name }})

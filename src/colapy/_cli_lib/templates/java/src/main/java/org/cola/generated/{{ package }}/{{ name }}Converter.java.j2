@@ -1,0 +1,9 @@
+package org.cola.generated.{{ package }};
+
+import org.cola.api.Converter;
+import org.cola.api.EventData;
+
+public abstract class {{ name }}Converter implements Converter {
+    @Override
+    public abstract EventData convert(EventData event);
+}

@@ -1,0 +1,35 @@
+plugins {
+    java
+    checkstyle
+}
+
+version = "{{ version }}"
+repositories { mavenCentral() }
+val colaJvmApi = providers.gradleProperty("colaJvmApi")
+dependencies {
+    if (colaJvmApi.isPresent) {
+        compileOnly(files(colaJvmApi.get()))
+    } else {
+        compileOnly("io.github.zakayz:cola-jvm-api:0.1.0")
+    }
+}
+
+tasks.withType<JavaCompile>().configureEach {
+    options.release.set(17)
+    options.encoding = "UTF-8"
+    options.compilerArgs.addAll(listOf("-Xlint:all", "-Werror"))
+}
+checkstyle {
+    toolVersion = "10.26.1"
+    configFile = file("config/checkstyle/checkstyle.xml")
+    isIgnoreFailures = false
+    maxWarnings = 0
+}
+
+tasks.register<Jar>("colaJar") {
+    archiveFileName.set("{{ name }}-all.jar")
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from(sourceSets.main.get().output)
+    dependsOn(configurations.runtimeClasspath)
+    from({ configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) } })
+}

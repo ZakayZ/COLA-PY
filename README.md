@@ -2,61 +2,37 @@
 
 [![CI](https://github.com/ZakayZ/COLA-PY/actions/workflows/ci.yml/badge.svg)](https://github.com/ZakayZ/COLA-PY/actions/workflows/ci.yml)
 
-Python обертка над фреймворком COLA.
+Python bindings and CLI for [COLA](https://github.com/Spectator-matter-group-INR-RAS/COLA).
 
-## Installation
+## Quick start
 
-If you don't have [COLA library](https://github.com/Spectator-matter-group-INR-RAS/COLA) already present on your system, set environment variable before installing to specify where to install COLA.
-
-```shell
-export COLA_INSTALL_PREFIX="~/.local" # or your path to COLA plugins dir
-```
-
-Then install as usual python package
+Install from source into an explicit native COLA prefix (requires Git, CMake and a C++ compiler):
 
 ```shell
-pip install colapy
+COLA_INSTALL_PREFIX="$HOME/physics/cola" python -m pip install --no-binary=colapy colapy
+export COLA_DIR="$HOME/physics/cola"
+cola run --config config.xml --library COLA-Py
 ```
 
-## Usage
+Use an XML configuration referring to your installed filters.
 
-### cola script
+`GeneratorBase` transfers its returned event to COLA, without a copy.
+`ConverterBase` and `WriterBase` receive Python-owned events, which may be
+retained. For zero-copy in-place filters, use ordinary Python classes with
+`__call__(event)` and the XML factory names `PythonUnsafeGenerator` and
+`PythonUnsafeConverter`; borrowed events must not escape their callback.
 
-`colapy` package installs `cola` utility to your system.
+## Project setup
 
-#### Setup
-
-To setup a new COLA module you can run the following command:
+Create a project with Generator, Converter and Writer stubs:
 
 ```shell
-cola setup project --name="ModuleName" --prefix="PathToProjectDir" --version="1.0.0"
+cola setup project --name MyProject --language python --prefix ./projects
 ```
 
-#### Run
+Supported languages: `cpp`, `python`, `fortran`, `java`, `julia`. Add your filter implementations
+to the generated project.
 
-It is possible to run COLA calculation without the need to write and compile driver C++ code.
-If you have COLA modules installed on your system you can run the calculation using filters exposed by them with the following command:
+## Examples
 
-```shell
-cola run \
-    --config="<path_to_config>/config.xml" \ # config that can use all the filters from the included libraries
-    --library="COLA-Py" # includes filters from COLA-Py module
-    --library="Deexcitation" # includes filters from Deexcitation module
-```
-
-## Develop
-
-To install locally from source run from the repo root
-
-```shell
-pip install -e .
-```
-
-### Publish
-
-To publish your changes to the [pypi](https://pypi.org) run from the repo root
-
-```shell
-python -m build --sdist
-python -m twine upload dist/*
-```
+See the examples to learn how to write a [simple filter library](examples/pylib/) and work with [typed parameters](examples/typed_parameters/).

@@ -46,6 +46,8 @@ TEST(COLAPyModuleTest, ModuleExposesNamedFactories) {
   ASSERT_NE(factories.find("PythonGenerator"), factories.end());
   ASSERT_NE(factories.find("PythonConverter"), factories.end());
   ASSERT_NE(factories.find("PythonWriter"), factories.end());
+  ASSERT_NE(factories.find("PythonUnsafeGenerator"), factories.end());
+  ASSERT_NE(factories.find("PythonUnsafeConverter"), factories.end());
 }
 
 TEST(COLAPyModuleTest, CreateFilterThrowsWithoutClass) {
@@ -101,4 +103,28 @@ TEST(COLAPyModuleTest, FiltersProcessKwargsFromXml) {
   auto converted = (*ensemble.converters[0])(std::move(event));
   ASSERT_NE(converted, nullptr);
   EXPECT_FLOAT_EQ(converted->particles[0].momentum.e, 10.0f);
+}
+
+TEST(COLAPyModuleTest, UnsafeFiltersBorrowThePipelineEvent) {
+  SetupTestPythonPath();
+
+  cola::python::COLAPyModule module;
+  cola::MetaProcessor processor(module.GetModuleFilters());
+  std::istringstream stream(R"(<?xml version="1.0"?>
+<program>
+    <generator name="PythonUnsafeGenerator" class="pylib.UnsafeGenerator"/>
+    <converter name="PythonUnsafeConverter" class="pylib.UnsafeConverter" delta_e="7.0"/>
+    <writer name="PythonWriter" class="pylib.Writer"/>
+</program>
+)");
+  cola::FilterEnsemble ensemble = processor.Parse(stream);
+
+  auto event = (*ensemble.generator)();
+  ASSERT_NE(event, nullptr);
+  EXPECT_FLOAT_EQ(event->ini_state.energy, 3.0f);
+
+  auto* address = event.get();
+  auto converted = (*ensemble.converters[0])(std::move(event));
+  EXPECT_EQ(converted.get(), address);
+  EXPECT_FLOAT_EQ(converted->ini_state.energy, 10.0f);
 }

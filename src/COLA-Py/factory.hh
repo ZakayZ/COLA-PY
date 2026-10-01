@@ -27,6 +27,26 @@ namespace cola::python {
     std::unique_ptr<cola::VFilter> Create(const std::unordered_map<std::string, std::string>& meta_data) final;
   };
 
+  class PythonUnsafeGeneratorFactory : public cola::VGeneratorFactory {
+   public:
+    const std::string& GetFilterName() const override {
+      static const std::string name = "PythonUnsafeGenerator";
+      return name;
+    }
+
+    std::unique_ptr<cola::VFilter> Create(const std::unordered_map<std::string, std::string>& meta_data) final;
+  };
+
+  class PythonUnsafeConverterFactory : public cola::VConverterFactory {
+   public:
+    const std::string& GetFilterName() const override {
+      static const std::string name = "PythonUnsafeConverter";
+      return name;
+    }
+
+    std::unique_ptr<cola::VFilter> Create(const std::unordered_map<std::string, std::string>& meta_data) final;
+  };
+
   class PythonWriterFactory : public cola::VWriterFactory {
    public:
     const std::string& GetFilterName() const override {

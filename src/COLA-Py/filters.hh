@@ -11,11 +11,29 @@ namespace cola::python {
     PythonConverter(const std::string& import_path, const std::unordered_map<std::string, std::string>& meta_data);
 
     std::unique_ptr<EventData> operator()(std::unique_ptr<EventData>&& data) override;
+
   };
 
   class PythonGenerator : public VGenerator, private PythonFilterBase {
    public:
     PythonGenerator(const std::string& import_path, const std::unordered_map<std::string, std::string>& meta_data);
+
+    std::unique_ptr<EventData> operator()() override;
+  };
+
+  class PythonUnsafeConverter : public VConverter, private PythonFilterBase {
+   public:
+    PythonUnsafeConverter(const std::string& import_path,
+                          const std::unordered_map<std::string, std::string>& meta_data);
+
+    std::unique_ptr<EventData> operator()(std::unique_ptr<EventData>&& data) override;
+
+  };
+
+  class PythonUnsafeGenerator : public VGenerator, private PythonFilterBase {
+   public:
+    PythonUnsafeGenerator(const std::string& import_path,
+                          const std::unordered_map<std::string, std::string>& meta_data);
 
     std::unique_ptr<EventData> operator()() override;
   };
