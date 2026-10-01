@@ -103,8 +103,6 @@ def write_project(name, prefix, version, language, force, section=None):
     except OSError as error:
         raise click.ClickException(str(error)) from error
     click.echo(f"Created {language} project files in {root}")
-    if section is None:
-        click.echo(f"Build and code-quality instructions: {root / 'README.md'}")
 
 
 def options(function):

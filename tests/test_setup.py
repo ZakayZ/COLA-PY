@@ -65,7 +65,7 @@ def test_generate_complete_file_manifest(tmp_path, language, expected_files):
     assert result.exit_code == 0, result.output
     root = tmp_path / "My_Project42"
     actual_files = {path.relative_to(root).as_posix() for path in root.rglob("*") if path.is_file()}
-    assert actual_files == expected_files | {".editorconfig", ".gitignore", "README.md"}
+    assert actual_files == expected_files | {".editorconfig", ".gitignore"}
     for relative in sorted(actual_files):
         content = (root / relative).read_text(encoding="utf-8")
         assert content.strip(), f"Empty generated file: {relative}"
@@ -97,7 +97,7 @@ def test_generate_project(tmp_path, language, source, quality):
     assert (root / quality).is_file()
     assert (root / ".editorconfig").is_file()
     assert (root / ".gitignore").is_file()
-    assert "2.3.4" in (root / "README.md").read_text()
+    assert not (root / "README.md").exists()
     assert not (root / "config.xml").exists()
     assert not (root / "tests").exists()
     assert ".ruff_cache" not in (root / ".gitignore").read_text()
