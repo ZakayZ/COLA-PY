@@ -6,16 +6,12 @@
 #include <COLA.hh>
 
 namespace cola::python {
-  class PythonConverter : public VConverter, public VTimedConverter, private PythonFilterBase {
+  class PythonConverter : public VConverter, private PythonFilterBase {
    public:
     PythonConverter(const std::string& import_path, const std::unordered_map<std::string, std::string>& meta_data);
 
     std::unique_ptr<EventData> operator()(std::unique_ptr<EventData>&& data) override;
 
-    std::uint64_t LastCallbackNanoseconds() const override { return last_callback_nanoseconds_; }
-
-   private:
-    std::uint64_t last_callback_nanoseconds_{};
   };
 
   class PythonGenerator : public VGenerator, private PythonFilterBase {
@@ -25,17 +21,13 @@ namespace cola::python {
     std::unique_ptr<EventData> operator()() override;
   };
 
-  class PythonUnsafeConverter : public VConverter, public VTimedConverter, private PythonFilterBase {
+  class PythonUnsafeConverter : public VConverter, private PythonFilterBase {
    public:
     PythonUnsafeConverter(const std::string& import_path,
                           const std::unordered_map<std::string, std::string>& meta_data);
 
     std::unique_ptr<EventData> operator()(std::unique_ptr<EventData>&& data) override;
 
-    std::uint64_t LastCallbackNanoseconds() const override { return last_callback_nanoseconds_; }
-
-   private:
-    std::uint64_t last_callback_nanoseconds_{};
   };
 
   class PythonUnsafeGenerator : public VGenerator, private PythonFilterBase {
